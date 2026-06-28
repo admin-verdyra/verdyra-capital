@@ -7,6 +7,7 @@ import { useEffect, type MouseEvent } from 'react';
 const navItems = [
   { label: 'Home', href: '#home' },
   { label: 'Funding Solutions', href: '#solutions' },
+  { label: 'Partners', href: '#partners' },
   { label: 'EMI Calculator', href: '#calculator' },
   { label: 'About Us', href: '#about' },
   { label: 'Contact', href: '#contact' },
