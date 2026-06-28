@@ -25,7 +25,16 @@ export default function AboutVerdyra() {
             About Verdyra Capital
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            Verdyra Capital is the flagship capital advisory brand of Verdyra Fintech Private Limited. We help businesses identify and access suitable financing solutions through our network of financial institutions. Our focus is on simplifying the funding journey with expert advisory, faster decision-making and transparent processes.
+            Verdyra Capital is a fintech financing platform helping MSMEs, founders and individuals access the right funding from India&apos;s leading Banks, NBFCs and other regulated financial institutions.
+          </p>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            We simplify the financing journey by understanding every customer&apos;s funding requirement and connecting them with lending solutions that best match their profile and business needs.
+          </p>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            Whether it is working capital, unsecured business loans, machinery finance, invoice discounting, expansion capital or structured debt, our technology-driven platform helps customers identify and access suitable financing solutions quickly and efficiently.
+          </p>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            Our mission is simple: To help businesses and individuals access the right capital at competitive interest rates through trusted regulated financial institutions across India.
           </p>
         </div>
 

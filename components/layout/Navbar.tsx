@@ -48,7 +48,7 @@ export default function Navbar() {
             href="#eligibility"
             className="rounded-full bg-[#0F6B47] px-6 py-3 text-[15px] font-semibold text-white transition hover:bg-[#0A5638]"
           >
-            Check Eligibility
+            Get Funded
           </a>
         </div>
 
