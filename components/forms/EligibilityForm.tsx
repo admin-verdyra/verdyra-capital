@@ -339,7 +339,15 @@ export default function EligibilityForm() {
             className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0F5A3A] focus:ring-[#0F5A3A]"
           />
           <span>
-            I agree to the Terms & Conditions and Privacy Policy.
+            I agree to the{' '}
+            <a href="/terms-and-conditions" className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline">
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="/privacy-policy" className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline">
+              Privacy Policy
+            </a>
+            , and consent to being contacted by Verdyra Capital and its lending partners regarding my financing enquiry.
           </span>
         </label>
 
@@ -348,7 +356,7 @@ export default function EligibilityForm() {
           disabled={isSubmitting}
           className="w-full rounded-full bg-[#B8860B] px-5 py-3.5 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#9f6f08] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isSubmitting ? 'Submitting…' : 'Check Eligibility'}
+          {isSubmitting ? 'Submitting…' : 'Submit Enquiry'}
         </button>
 
         {message ? (

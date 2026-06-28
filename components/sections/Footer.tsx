@@ -1,6 +1,10 @@
 import Image from 'next/image';
 
-const footerLinks = ['Privacy Policy', 'Terms & Conditions', 'Disclaimer'];
+const footerLinks = [
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Terms of Service', href: '/terms-and-conditions' },
+  { label: 'Disclaimer', href: '/disclaimer' },
+];
 const services = ['Business Loans', 'Revenue Based Financing', 'Invoice Discounting', 'Structured Debt'];
 
 export default function Footer() {
@@ -48,7 +52,11 @@ export default function Footer() {
             </p>
             <ul className="mt-4 space-y-3 text-sm text-slate-300">
               {footerLinks.map((link) => (
-                <li key={link}>{link}</li>
+                <li key={link.label}>
+                  <a href={link.href} className="transition hover:text-[#B8860B]">
+                    {link.label}
+                  </a>
+                </li>
               ))}
             </ul>
           </div>
