@@ -98,7 +98,7 @@ export default function EligibilityForm() {
       setStatus('idle');
       setMessage('');
 
-      const response = await fetch('https://formsubmit.co/ajax/connect@verdyracapital.in', {
+      const response = await fetch('/api/enquiries', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
