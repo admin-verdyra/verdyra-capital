@@ -6,19 +6,25 @@ const partners = [
   { name: 'Knight Fintech', url: 'https://knightfintech.com/' },
 ];
 
+const trustIndicators = [
+  { title: 'Trusted Lending Partners', icon: '✓' },
+  { title: 'Nationwide Coverage', icon: '◌' },
+  { title: 'Fast Digital Processing', icon: '⚡' },
+];
+
 export default function PartnersSection() {
   return (
     <section id="partners" className="bg-[#F8FAF9] px-6 py-14 sm:px-8 lg:px-10 lg:py-16">
       <div className="mx-auto max-w-7xl rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_20px_60px_rgba(17,17,17,0.05)] sm:p-10 lg:p-12">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#0F5A3A]">
-            Lending Partners
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#B8860B]">
+            Our Lending Ecosystem
           </p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#111111] sm:text-4xl">
-            Lending Partners
+            Powering Growth Through Trusted Lending Partners
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-            Verdyra Capital works with leading Banks, NBFCs and FinTech lenders to help businesses and individuals access the right financing solutions quickly and efficiently.
+            Access financing through India&apos;s trusted Banks, NBFCs and FinTech lending partners—helping businesses and individuals secure the right capital with speed and confidence.
           </p>
         </div>
 
@@ -61,6 +67,15 @@ export default function PartnersSection() {
               Become a Lending Partner
             </a>
           </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          {trustIndicators.map((item) => (
+            <div key={item.title} className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-[0_6px_20px_rgba(17,17,17,0.03)]">
+              <span className="text-base text-[#B8860B]">{item.icon}</span>
+              <span>{item.title}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
