@@ -1,12 +1,6 @@
 import type { ReactNode } from 'react';
 
-const contactItems = [
-  {
-    title: 'Email',
-    value: 'connect@verdyracapital.in',
-    href: 'mailto:connect@verdyracapital.in',
-    icon: 'email' as const,
-  },
+const contactDetails = [
   {
     title: 'Phone',
     value: '+91 7011206752',
@@ -14,27 +8,20 @@ const contactItems = [
     icon: 'phone' as const,
   },
   {
-    title: 'Registered Office',
-    value: 'A100, First Floor\nBlock A, Sushant Lok Phase – 3\nGurugram – 122003\nHaryana, India',
-    href: 'https://maps.google.com/?q=Verdyra+Fintech+Private+Limited',
-    icon: 'office' as const,
+    title: 'Email',
+    value: 'connect@verdyracapital.in',
+    href: 'mailto:connect@verdyracapital.in',
+    icon: 'email' as const,
   },
   {
     title: 'Corporate Office',
-    value: '4th Floor, Magnum Towers\nGolf Course Extension Road\nSector 58\nGurugram – 122011\nHaryana, India',
-    href: 'https://maps.google.com/?q=Verdyra+Fintech+Private+Limited',
+    value: '4th Floor, Magnum Towers\nGolf Course Extension Road\nSector 58\nGurugram – 122011\nHaryana – 122011',
     icon: 'office' as const,
-  },
-  {
-    title: 'Working Hours',
-    value: 'Monday – Saturday\n9:30 AM – 6:30 PM',
-    href: '#home',
-    icon: 'hours' as const,
   },
 ];
 
 function ContactIcon({ type }: { type: 'phone' | 'email' | 'office' | 'hours' }) {
-  const commonClassName = 'h-5 w-5';
+  const commonClassName = 'h-4 w-4';
 
   const icons: Record<'phone' | 'email' | 'office' | 'hours', ReactNode> = {
     phone: (
@@ -69,21 +56,24 @@ function ContactIcon({ type }: { type: 'phone' | 'email' | 'office' | 'hours' })
 
 export default function ContactSection() {
   return (
-    <section id="contact" className="bg-[#F8FAF9] px-6 py-20 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-7xl rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_20px_60px_rgba(17,17,17,0.05)] sm:p-10 lg:p-12">
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div>
+    <section id="contact" className="bg-[#F8FAF9] px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
+      <div className="mx-auto max-w-7xl rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(17,17,17,0.05)] sm:p-8 lg:p-10">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#0F5A3A]">
               Contact
             </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-[#111111] sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#111111] sm:text-4xl">
               Get in Touch
             </h2>
-            <p className="mt-4 text-lg leading-8 text-slate-600">
-              Looking for the right financing solution? Our specialists are ready to help you identify the most suitable funding options for your business or personal financial requirements.
+            <p className="mt-3 text-lg leading-7 text-slate-600">
+              Looking for the right financing solution?
+            </p>
+            <p className="mt-2 text-base leading-7 text-slate-600">
+              Our financing specialists are ready to help you identify the best funding options for your business or personal financial requirements.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <a
                 href="#eligibility"
                 className="inline-flex items-center justify-center rounded-full bg-[#0F5A3A] px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0a472f]"
@@ -104,34 +94,52 @@ export default function ContactSection() {
               </a>
             </div>
 
-            <div className="mt-10 rounded-[24px] border border-slate-200 bg-[#F8FAF9] p-6">
+            <div className="mt-8 rounded-[20px] border border-slate-200 bg-[#F8FAF9] p-5 sm:p-6">
               <p className="text-base font-semibold text-[#111111]">
-                Helping businesses and individuals access the right financing through India&apos;s leading Banks, NBFCs and other regulated financial institutions.
+                Helping businesses and individuals access financing through India&apos;s leading Banks, NBFCs and regulated financial institutions.
               </p>
-              <p className="mt-3 text-sm font-medium text-[#0F5A3A]">
+              <p className="mt-2 text-sm font-medium text-[#0F5A3A]">
                 Fast. Transparent. Reliable.
+              </p>
+              <p className="mt-3 text-sm leading-6 text-slate-500">
+                Need help choosing the right financing solution? Our specialists typically respond within one business day.
               </p>
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-slate-200 bg-[#F8FAF9] p-7">
-            <div className="space-y-4 text-sm text-slate-700">
-              <div>
-                <p className="text-base font-semibold text-[#111111]">Verdyra Fintech Private Limited</p>
+          <div className="rounded-[24px] border border-slate-200 bg-[#F8FAF9] p-5 shadow-[0_12px_30px_rgba(17,17,17,0.04)] sm:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#E3C76F]/40 bg-[#F7F1D8] text-[#0F5A3A]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                  <path d="M6 4h6l4 4v12H6z" />
+                  <path d="M12 4v4h4" />
+                </svg>
               </div>
-              {contactItems.map((item) => (
-                <div key={item.title} className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white/70 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E3C76F]/40 bg-[#F7F1D8] text-[#0F5A3A]">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0F5A3A]">
+                  Contact Information
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-sm text-slate-700">
+              {contactDetails.map((item) => (
+                <div key={item.title} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-3.5">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#E3C76F]/40 bg-[#F7F1D8] text-[#0F5A3A]">
                     <ContactIcon type={item.icon} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-base font-semibold text-[#111111]">{item.title}</p>
-                    <a
-                      href={item.href}
-                      className="mt-2 inline-flex text-[#0F5A3A] transition hover:text-[#B8860B]"
-                    >
-                      <span className="whitespace-pre-line">{item.value}</span>
-                    </a>
+                    <p className="text-sm font-semibold text-[#111111]">{item.title}</p>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="mt-1 inline-flex text-[#0F5A3A] transition hover:text-[#B8860B]"
+                      >
+                        <span className="whitespace-pre-line">{item.value}</span>
+                      </a>
+                    ) : (
+                      <p className="mt-1 whitespace-pre-line text-[#0F5A3A]">{item.value}</p>
+                    )}
                   </div>
                 </div>
               ))}
