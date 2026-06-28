@@ -68,7 +68,7 @@ export default function Hero() {
   }, [currentPhrase, phase, phraseIndex]);
 
   return (
-    <section className="relative overflow-hidden bg-[#F8FAF9] px-6 pb-10 pt-20 sm:px-8 lg:px-10 lg:pb-12 lg:pt-24">
+    <section id="home" className="relative overflow-hidden bg-[#F8FAF9] px-6 pb-10 pt-20 sm:px-8 lg:px-10 lg:pb-12 lg:pt-24">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(184,134,11,0.14),_transparent_44%)]" />
       <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] xl:gap-14">
         <div className="relative z-10 max-w-2xl">

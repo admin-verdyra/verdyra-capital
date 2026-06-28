@@ -42,7 +42,7 @@ export default function EmiCalculator() {
   }, [loanAmount, interestRate, tenure]);
 
   return (
-    <section className="bg-white px-6 py-20 sm:px-8 lg:px-10">
+    <section id="calculator" className="bg-white px-6 py-20 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl rounded-[32px] border border-slate-200 bg-[#F8FAF9] p-8 shadow-[0_20px_60px_rgba(17,17,17,0.05)] sm:p-10 lg:p-12">
         <div className="mb-10 max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#0F5A3A]">

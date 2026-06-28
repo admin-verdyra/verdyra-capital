@@ -41,7 +41,7 @@ const solutions = [
 
 export default function CapitalSolutions() {
   return (
-    <section className="bg-white px-6 py-20 sm:px-8 lg:px-10">
+    <section id="solutions" className="bg-white px-6 py-20 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#0F5A3A]">

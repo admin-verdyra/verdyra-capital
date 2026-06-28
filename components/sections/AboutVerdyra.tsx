@@ -15,7 +15,7 @@ const pillars = [
 
 export default function AboutVerdyra() {
   return (
-    <section className="bg-white px-6 py-20 sm:px-8 lg:px-10">
+    <section id="about" className="bg-white px-6 py-20 sm:px-8 lg:px-10">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#0F5A3A]">
