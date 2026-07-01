@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Verdyra Capital | Premium Fintech Lending",
+  title: "Verdyra Capital | India's Growth Capital Platform",
   description:
-    "Verdyra Capital offers collateral-free business financing, structured debt, and premium capital access for modern businesses.",
+    "Verdyra Capital offers collateral-free business loans, personal loans, structured debt, revenue-based financing, working capital and growth capital solutions for individuals and businesses.",
 };
 
 export default function RootLayout({
