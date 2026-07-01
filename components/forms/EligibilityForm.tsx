@@ -331,14 +331,14 @@ export default function EligibilityForm() {
           </div>
         </div>
 
-        <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600">
+        <label className="w-full flex flex-nowrap items-start gap-3 rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600">
           <input
             type="checkbox"
             checked={agreed}
             onChange={(event) => setAgreed(event.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0F5A3A] focus:ring-[#0F5A3A]"
+            className="mt-0 h-4 w-4 flex-none rounded border-slate-300 text-[#0F5A3A] focus:ring-[#0F5A3A]"
           />
-          <span>
+          <span className="flex-1 min-w-0 leading-[1.55]">
             I agree to the{' '}
             <a href="/terms-and-conditions" className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline">
               Terms of Service
