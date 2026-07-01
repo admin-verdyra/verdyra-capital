@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 type LoanType = 'business' | 'personal';
 
@@ -35,6 +35,14 @@ export default function EligibilityForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobileViewport(typeof window !== 'undefined' && window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const indicativeFunding = useMemo(() => {
     if (loanType === 'business') {
@@ -331,7 +339,10 @@ export default function EligibilityForm() {
           </div>
         </div>
 
-        <label className="w-full flex items-start gap-[10px] rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600">
+        <label
+          className="w-full flex items-start gap-[10px] rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600"
+          style={isMobileViewport ? { display: 'flex', alignItems: 'flex-start', gap: '10px' } : undefined}
+        >
           <input
             type="checkbox"
             checked={agreed}
