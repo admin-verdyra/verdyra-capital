@@ -133,7 +133,7 @@ export default function Hero() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               href="#eligibility"
-              className="rounded-full bg-[#0F5A3A] px-7 py-3.5 text-center text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0a472f]"
+              className="w-full sm:w-auto block rounded-full bg-[#0F5A3A] px-7 py-3.5 text-center text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0a472f]"
             >
               Get Funded
             </a>
@@ -141,7 +141,7 @@ export default function Hero() {
               href="https://docs.google.com/forms/d/e/1FAIpQLSeT7ZdQ6j1GNoI372-9VWBsFOdejJfgk7NLPnoiRFxBV1OQyg/viewform?usp=publish"
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-[#0F5A3A]/20 bg-white px-7 py-3.5 text-center text-sm font-semibold text-[#0F5A3A] transition duration-300 hover:-translate-y-0.5 hover:border-[#0F5A3A] hover:bg-[#F3F7F4]"
+              className="w-full sm:w-auto block rounded-full border border-[#0F5A3A]/20 bg-white px-7 py-3.5 text-center text-sm font-semibold text-[#0F5A3A] transition duration-300 hover:-translate-y-0.5 hover:border-[#0F5A3A] hover:bg-[#F3F7F4]"
             >
               Become a Lending Partner
             </a>

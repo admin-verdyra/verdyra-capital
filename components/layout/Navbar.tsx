@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, type MouseEvent } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 
 const navItems = [
   { label: 'Home', href: '#home' },
@@ -16,6 +16,7 @@ const navItems = [
 export default function Navbar() {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -81,6 +82,20 @@ export default function Navbar() {
           ))}
         </div>
 
+        {/* Mobile hamburger */}
+        <div className="flex items-center gap-3 lg:hidden">
+          <button
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-white/80 text-[#374151] shadow-sm ring-1 ring-[#E6E6E6]"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+
         <div className="flex flex-shrink-0 items-center">
           <Link
             href={getHref('#eligibility')}
@@ -91,6 +106,39 @@ export default function Navbar() {
           </Link>
         </div>
       </div>
+
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setOpen(false)} />
+          <div className="absolute right-4 top-20 w-[88%] max-w-[320px] rounded-xl bg-white p-4 shadow-xl">
+            <nav className="flex flex-col gap-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={getHref(item.href)}
+                  onClick={(event) => {
+                    handleClick(event, item.href);
+                    setOpen(false);
+                  }}
+                  className="block rounded-md px-3 py-3 text-base font-medium text-[#374151] hover:bg-[#F3F7F4]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link
+                href={getHref('#eligibility')}
+                onClick={(event) => {
+                  handleClick(event, '#eligibility');
+                  setOpen(false);
+                }}
+                className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-[#0F6B47] px-4 py-3 text-sm font-semibold text-white"
+              >
+                Get Funded
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

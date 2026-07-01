@@ -55,11 +55,11 @@ export default function CapitalSolutions() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-10 grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {solutions.map((solution) => (
             <div
               key={solution.title}
-              className="group rounded-[24px] border border-slate-200 bg-white p-7 shadow-[0_16px_45px_rgba(17,17,17,0.05)] transition duration-300 hover:-translate-y-1 hover:border-[#B8860B]/40 hover:shadow-[0_20px_55px_rgba(184,134,11,0.14)]"
+              className="group rounded-[24px] border border-slate-200 bg-white p-5 sm:p-6 lg:p-7 shadow-[0_16px_45px_rgba(17,17,17,0.05)] transition duration-300 hover:-translate-y-1 hover:border-[#B8860B]/40 hover:shadow-[0_20px_55px_rgba(184,134,11,0.14)]"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0F5A3A]/10 text-xl font-semibold text-[#0F5A3A] transition duration-300 group-hover:bg-[#B8860B]/15 group-hover:text-[#B8860B]">
                 {solution.icon}
@@ -78,7 +78,7 @@ export default function CapitalSolutions() {
               </div>
               <a
                 href="#eligibility"
-                className="mt-6 inline-flex items-center text-sm font-semibold text-[#0F5A3A] transition duration-300 group-hover:text-[#B8860B]"
+                className="mt-6 block w-full text-center sm:inline-flex sm:w-auto items-center text-sm font-semibold text-[#0F5A3A] transition duration-300 group-hover:text-[#B8860B] py-2"
               >
                 Learn More
                 <span className="ml-2 transition duration-300 group-hover:translate-x-1">→</span>

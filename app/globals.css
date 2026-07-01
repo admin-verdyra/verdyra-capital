@@ -30,3 +30,34 @@ body {
 a {
   text-decoration: none;
 }
+
+/* Mobile improvements only (<=1024px) - do not alter desktop styling */
+html, body {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 1024px) {
+  /* Ensure large touch targets on mobile */
+  a.rounded-full, button {
+    min-height: 44px;
+  }
+
+  /* Prevent accidental horizontal overflow */
+  .container, .mx-auto, .max-w-7xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make hero CTAs full width already handled via classes; ensure inputs and forms flow */
+  input, textarea, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

@@ -56,7 +56,7 @@ export default function EmiCalculator() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="grid gap-8 grid-cols-1 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
             <div className="space-y-7">
               <div>

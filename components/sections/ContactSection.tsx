@@ -76,19 +76,19 @@ export default function ContactSection() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <a
                 href="#eligibility"
-                className="inline-flex items-center justify-center rounded-full bg-[#0F5A3A] px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0a472f]"
+                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-[#0F5A3A] px-6 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#0a472f]"
               >
                 Get Funded
               </a>
               <a
                 href="tel:+917011206752"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-[#111111] transition duration-300 hover:border-[#0F5A3A] hover:text-[#0F5A3A]"
+                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-[#111111] transition duration-300 hover:border-[#0F5A3A] hover:text-[#0F5A3A]"
               >
                 Call Us
               </a>
               <a
                 href="mailto:connect@verdyracapital.in"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-[#111111] transition duration-300 hover:border-[#0F5A3A] hover:text-[#0F5A3A]"
+                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-[#111111] transition duration-300 hover:border-[#0F5A3A] hover:text-[#0F5A3A]"
               >
                 Email Us
               </a>

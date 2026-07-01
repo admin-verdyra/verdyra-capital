@@ -69,6 +69,8 @@ export default function PartnersSection() {
                         alt={partner.name}
                         width={160}
                         height={80}
+                        sizes="(max-width: 640px) 220px, (max-width: 1024px) 240px, 260px"
+                        loading="lazy"
                         className="w-[88%] max-h-full h-auto object-contain transition duration-300 group-hover:brightness-105"
                       />
                     </div>
@@ -130,6 +132,7 @@ export default function PartnersSection() {
       <style jsx>{`
         .partnerCarousel {
           overflow: hidden;
+          -webkit-overflow-scrolling: touch;
         }
 
         .scrollTrack {
@@ -139,8 +142,29 @@ export default function PartnersSection() {
           animation: scrollLeft 28s linear infinite;
         }
 
+        /* enable hover-pause (desktop) */
         .partnerCarousel:hover .scrollTrack {
           animation-play-state: paused;
+        }
+
+        /* make carousel touch-friendly and snap cards into place on small screens */
+        .partnerCarousel {
+          scroll-snap-type: x mandatory;
+        }
+
+        .scrollTrack > div {
+          scroll-snap-align: center;
+        }
+
+        @media (max-width: 768px) {
+          .partnerCarousel {
+            padding-left: calc((100% - 260px) / 2);
+            padding-right: calc((100% - 260px) / 2);
+          }
+
+          .scrollTrack {
+            gap: 0.75rem;
+          }
         }
 
         @keyframes scrollLeft {
