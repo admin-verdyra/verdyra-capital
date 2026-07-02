@@ -339,17 +339,14 @@ export default function EligibilityForm() {
           </div>
         </div>
 
-        <label
-          className="w-full flex items-start gap-[10px] rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600"
-          style={isMobileViewport ? { display: 'flex', alignItems: 'flex-start', gap: '10px' } : undefined}
-        >
+        <label className="w-full flex flex-row items-start gap-[10px] rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600">
           <input
             type="checkbox"
             checked={agreed}
             onChange={(event) => setAgreed(event.target.checked)}
-            className="mt-[3px] h-4 w-4 flex-none shrink-0 rounded border-slate-300 text-[#0F5A3A] focus:ring-[#0F5A3A]"
+            className="mt-[3px] h-4 w-4 flex-none rounded border-slate-300 text-[#0F5A3A] focus:ring-[#0F5A3A]"
           />
-          <span className="flex-1 w-full min-w-0 leading-[1.55]">
+          <span className="flex-1 min-w-0 leading-[1.55]">
             I agree to the{' '}
             <a href="/terms-and-conditions" className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline">
               Terms of Service
