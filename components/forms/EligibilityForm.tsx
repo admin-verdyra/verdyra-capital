@@ -331,7 +331,15 @@ export default function EligibilityForm() {
           </div>
         </div>
 
-        <label className="w-full flex flex-nowrap items-start gap-3 rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600">
+       <label
+  style={{
+    display: "grid",
+    gridTemplateColumns: "20px 1fr",
+    columnGap: "12px",
+    alignItems: "start",
+  }}
+  className="w-full rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600"
+>
           <input
             type="checkbox"
             checked={agreed}
