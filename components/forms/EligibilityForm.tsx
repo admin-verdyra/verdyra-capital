@@ -18,7 +18,13 @@ const businessCategories = [
   'Other',
 ];
 
-const turnoverOptions = ['₹25L - ₹1Cr', '₹1Cr - ₹5Cr', '₹5Cr - ₹20Cr', '₹20Cr+'];
+const turnoverOptions = ['₹1L - ₹5L',
+  '₹5L - ₹10L',
+  '₹10L - ₹25L',
+  '₹25L - ₹50L',
+  '₹50L - ₹1Cr',
+  '₹1Cr - ₹5Cr',
+  '₹5Cr+',];
 const vintageOptions = ['0 - 1 year', '1 - 3 years', '3 - 5 years', '5+ years'];
 
 export default function EligibilityForm() {
@@ -37,20 +43,22 @@ export default function EligibilityForm() {
   const [message, setMessage] = useState('');
 
   const indicativeFunding = useMemo(() => {
-    if (loanType === 'business') {
-      const turnoverValue = monthlyTurnover.includes('₹25L')
-        ? 2500000
-        : monthlyTurnover.includes('₹1Cr - ₹5Cr')
-          ? 30000000
-          : monthlyTurnover.includes('₹5Cr - ₹20Cr')
-            ? 125000000
-            : 250000000;
-      return turnoverValue * 3;
-    }
+  if (loanType === 'business') {
+    const fundingMap: Record<string, number> = {
+      '₹1L - ₹5L': 1000000,      // ₹10 Lakh
+      '₹5L - ₹10L': 2500000,     // ₹25 Lakh
+      '₹10L - ₹25L': 7500000,    // ₹75 Lakh
+      '₹25L - ₹50L': 15000000,   // ₹1.5 Crore
+      '₹50L - ₹1Cr': 30000000,   // ₹3 Crore
+      '₹1Cr - ₹5Cr': 100000000,  // ₹10 Crore
+      '₹5Cr+': 250000000,        // ₹25 Crore
+    };
 
-    const incomeValue = 1200000;
-    return incomeValue * 2;
-  }, [loanType, monthlyTurnover]);
+    return fundingMap[monthlyTurnover] ?? 1000000;
+  }
+
+  return 2500000; // ₹25 Lakh for personal loans (placeholder)
+}, [loanType, monthlyTurnover]);
 
   const fundingLabel = new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -147,7 +155,7 @@ export default function EligibilityForm() {
               : 'text-[#0F5A3A]/80 hover:text-[#0F5A3A]'
           }`}
         >
-          Business Loan
+          Business Funding
         </button>
         <button
           type="button"
@@ -264,20 +272,20 @@ export default function EligibilityForm() {
       )}
 
       <div className="mt-6 rounded-[24px] border border-[#0F5A3A]/10 bg-[#F8FAF9] p-5">
-        <p className="text-sm font-medium text-[#0F5A3A]">Indicative Funding</p>
+        <p className="text-sm font-medium text-[#0F5A3A]">Estimated Eligible Funding</p>
         <p className="mt-2 text-5xl font-semibold tracking-tight text-[#111111] sm:text-6xl">
           {fundingLabel}
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <div className="rounded-full border border-[#0F5A3A]/10 bg-white px-3 py-2 text-sm text-slate-700">
-            Interest Rate: Starting from 8%
+            Funding from ₹1 Lakh to ₹25 Crore
           </div>
           <div className="rounded-full border border-[#0F5A3A]/10 bg-white px-3 py-2 text-sm text-slate-700">
-            Expected Decision: Within 2 Business Days
+            5+ Leading Banks & NBFCs
           </div>
         </div>
         <p className="mt-3 text-sm text-slate-600">
-          Indicative estimate only. Final eligibility is subject to lender assessment.
+          Estimated eligibility based on your selected business profile. Final approval is subject to lender assessment.
         </p>
       </div>
 
