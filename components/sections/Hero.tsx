@@ -6,7 +6,6 @@ import EligibilityForm from '../forms/EligibilityForm';
 const phrases = [
   'for Growth.',
   'for Expansion.',
-  'up to ₹25 Crore.',
   'Without Compromise.',
   'That Moves Business Forward.',
 ];
@@ -87,17 +86,44 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-[28px] border border-[#0F5A3A]/10 bg-gradient-to-r from-[#0F5A3A] to-[#135f41] p-5 text-white shadow-[0_20px_60px_rgba(15,90,58,0.16)] sm:p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F2D58E] sm:text-xs">
-              Growth Capital
-            </p>
-            <p className="mt-2 text-xl font-semibold sm:text-2xl">
-              Funding Solutions from ₹1 Lakh to ₹25 Crore
-            </p>
-            <p className="mt-2 text-sm text-[#E9F5EF] sm:text-[15px]">
-              Interest Rates from as low as 8%* per annum
-            </p>
-          </div>
+         <div className="mt-6 rounded-[32px] bg-gradient-to-r from-[#0F5A3A] to-[#146A47] p-6 text-white shadow-[0_24px_70px_rgba(15,90,58,0.20)]">
+
+  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#F2D58E]">
+    India's Growth Capital Platform
+  </p>
+
+  <div className="mt-4 flex items-center gap-3">
+    <span className="text-3xl font-bold sm:text-5xl">
+      ₹1L
+    </span>
+
+    <span className="text-2xl text-[#F2D58E]">
+      →
+    </span>
+
+    <span className="text-3xl font-bold sm:text-5xl">
+      ₹25Cr
+    </span>
+  </div>
+
+  <div className="mt-5 flex flex-wrap gap-3">
+
+    <div className="mt-5 flex flex-wrap gap-3">
+  <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium">
+    Starting from 8%*
+  </div>
+
+  <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium">
+    Collateral-Free Loans
+  </div>
+
+  <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium">
+    Disbursal in 2 Days
+  </div>
+</div>
+  </div>
+
+</div>
 
           <h1 className="mt-8 text-4xl font-semibold leading-tight tracking-tight text-[#111111] sm:text-5xl lg:text-6xl">
             Need Capital.
