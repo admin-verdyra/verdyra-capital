@@ -120,9 +120,7 @@ export default function PartnersSection() {
               key={item.title}
               className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-[0_6px_20px_rgba(17,17,17,0.03)]"
             >
-              <span className="text-base text-[#B8860B]">
-                {item.icon}
-              </span>
+              <span className="text-base text-[#B8860B]">{item.icon}</span>
 
               <span>{item.title}</span>
             </div>

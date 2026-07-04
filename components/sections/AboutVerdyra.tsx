@@ -1,15 +1,18 @@
 const pillars = [
   {
-    title: 'Trusted Advisory',
-    description: 'Expert guidance that simplifies the funding journey and aligns capital solutions with your goals.',
+    title: "Trusted Advisory",
+    description:
+      "Expert guidance that simplifies the funding journey and aligns capital solutions with your goals.",
   },
   {
-    title: 'Faster Decisions',
-    description: 'Streamlined support and lender coordination that helps accelerate funding conversations.',
+    title: "Faster Decisions",
+    description:
+      "Streamlined support and lender coordination that helps accelerate funding conversations.",
   },
   {
-    title: 'Tailored Financing',
-    description: 'Financing pathways designed around your business stage, revenue profile, and growth plans.',
+    title: "Tailored Financing",
+    description:
+      "Financing pathways designed around your business stage, revenue profile, and growth plans.",
   },
 ];
 
@@ -25,16 +28,25 @@ export default function AboutVerdyra() {
             About Verdyra Capital
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            Verdyra Capital is a fintech financing platform helping MSMEs, founders and individuals access the right funding from India&apos;s leading Banks, NBFCs and other regulated financial institutions.
+            Verdyra Capital is a fintech financing platform helping MSMEs,
+            founders and individuals access the right funding from India&apos;s
+            leading Banks, NBFCs and other regulated financial institutions.
           </p>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            We simplify the financing journey by understanding every customer&apos;s funding requirement and connecting them with lending solutions that best match their profile and business needs.
+            We simplify the financing journey by understanding every
+            customer&apos;s funding requirement and connecting them with lending
+            solutions that best match their profile and business needs.
           </p>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            Whether it is working capital, unsecured business loans, machinery finance, invoice discounting, expansion capital or structured debt, our technology-driven platform helps customers identify and access suitable financing solutions quickly and efficiently.
+            Whether it is working capital, unsecured business loans, machinery
+            finance, invoice discounting, expansion capital or structured debt,
+            our technology-driven platform helps customers identify and access
+            suitable financing solutions quickly and efficiently.
           </p>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            Our mission is simple: To help businesses and individuals access the right capital at competitive interest rates through trusted regulated financial institutions across India.
+            Our mission is simple: To help businesses and individuals access the
+            right capital at competitive interest rates through trusted
+            regulated financial institutions across India.
           </p>
         </div>
 
@@ -47,8 +59,12 @@ export default function AboutVerdyra() {
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0F5A3A]/10 text-[#0F5A3A]">
                 ✦
               </div>
-              <h3 className="mt-5 text-lg font-semibold text-[#111111]">{pillar.title}</h3>
-              <p className="mt-2 text-sm leading-7 text-slate-600">{pillar.description}</p>
+              <h3 className="mt-5 text-lg font-semibold text-[#111111]">
+                {pillar.title}
+              </h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                {pillar.description}
+              </p>
             </div>
           ))}
         </div>

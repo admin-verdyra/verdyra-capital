@@ -1,11 +1,16 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 const footerLinks = [
-  { label: 'Privacy Policy', href: '/privacy-policy' },
-  { label: 'Terms of Service', href: '/terms-and-conditions' },
-  { label: 'Disclaimer', href: '/disclaimer' },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Service", href: "/terms-and-conditions" },
+  { label: "Disclaimer", href: "/disclaimer" },
 ];
-const services = ['Business Loans', 'Revenue Based Financing', 'Invoice Discounting', 'Structured Debt'];
+const services = [
+  "Business Loans",
+  "Revenue Based Financing",
+  "Invoice Discounting",
+  "Structured Debt",
+];
 
 export default function Footer() {
   return (
@@ -18,17 +23,26 @@ export default function Footer() {
             width={220}
             height={60}
             className="h-auto w-[170px] sm:w-[220px]"
+            style={{ height: "auto" }}
           />
           <p className="mt-3 text-sm text-slate-300">
             Brand of Verdyra Fintech Private Limited
           </p>
           <div className="mt-6 space-y-2 text-sm text-slate-300">
             <p className="font-medium text-white">Email</p>
-            <a href="mailto:connect@verdyracapital.in" className="transition hover:text-[#B8860B]">
+            <a
+              href="mailto:connect@verdyracapital.in"
+              className="transition hover:text-[#B8860B]"
+            >
               connect@verdyracapital.in
             </a>
             <p className="pt-2 font-medium text-white">Website</p>
-            <a href="http://www.verdyracapital.in/" target="_blank" rel="noreferrer" className="transition hover:text-[#B8860B]">
+            <a
+              href="http://www.verdyracapital.in/"
+              target="_blank"
+              rel="noreferrer"
+              className="transition hover:text-[#B8860B]"
+            >
               www.verdyracapital.in
             </a>
           </div>
@@ -53,7 +67,10 @@ export default function Footer() {
             <ul className="mt-4 space-y-3 text-sm text-slate-300">
               {footerLinks.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="transition hover:text-[#B8860B]">
+                  <a
+                    href={link.href}
+                    className="transition hover:text-[#B8860B]"
+                  >
                     {link.label}
                   </a>
                 </li>

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 interface StickySectionProps {
   children: ReactNode;
@@ -10,8 +10,8 @@ interface StickySectionProps {
 
 export default function StickySection({
   children,
-  background = '#ffffff',
-  className = '',
+  background = "#ffffff",
+  className = "",
 }: StickySectionProps) {
   return (
     <section

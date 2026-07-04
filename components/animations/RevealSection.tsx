@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ReactNode, useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { ReactNode, useEffect, useRef } from "react";
+import gsap from "gsap";
 
 interface RevealSectionProps {
   children: ReactNode;
@@ -10,7 +10,7 @@ interface RevealSectionProps {
 
 export default function RevealSection({
   children,
-  className = '',
+  className = "",
 }: RevealSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -29,7 +29,7 @@ export default function RevealSection({
             opacity: 1,
             y: 0,
             duration: 0.9,
-            ease: 'power3.out',
+            ease: "power3.out",
           });
 
           observer.disconnect();
@@ -37,7 +37,7 @@ export default function RevealSection({
       },
       {
         threshold: 0.15,
-      }
+      },
     );
 
     observer.observe(sectionRef.current);

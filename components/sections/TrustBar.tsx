@@ -1,9 +1,9 @@
 const stats = [
-  { value: '₹100+ Crores', label: 'Disbursed', icon: '₹' },
-  { value: '500+', label: 'Brands Funded', icon: '◌' },
-  { value: '5+', label: 'Lending Partners', icon: '⌁' },
-  { value: '98%', label: 'Application Assistance', icon: '✓' },
-  { value: '10+ Years', label: 'Lending Experience', icon: '✦' },
+  { value: "₹100+ Crores", label: "Disbursed", icon: "₹" },
+  { value: "500+", label: "Brands Funded", icon: "◌" },
+  { value: "5+", label: "Lending Partners", icon: "⌁" },
+  { value: "98%", label: "Application Assistance", icon: "✓" },
+  { value: "10+ Years", label: "Lending Experience", icon: "✦" },
 ];
 
 export default function TrustBar() {

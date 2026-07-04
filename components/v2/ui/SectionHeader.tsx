@@ -2,17 +2,21 @@ interface SectionHeaderProps {
   eyebrow?: string;
   title: string;
   description?: string;
-  align?: 'left' | 'center';
+  align?: "left" | "center";
 }
 
 export default function SectionHeader({
   eyebrow,
   title,
   description,
-  align = 'left',
+  align = "left",
 }: SectionHeaderProps) {
   return (
-    <div className={align === 'center' ? 'text-center max-w-3xl mx-auto' : 'max-w-3xl'}>
+    <div
+      className={
+        align === "center" ? "text-center max-w-3xl mx-auto" : "max-w-3xl"
+      }
+    >
       {eyebrow && (
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0F5A3A]">
           {eyebrow}
@@ -24,9 +28,7 @@ export default function SectionHeader({
       </h2>
 
       {description && (
-        <p className="mt-6 text-lg leading-8 text-slate-600">
-          {description}
-        </p>
+        <p className="mt-6 text-lg leading-8 text-slate-600">{description}</p>
       )}
     </div>
   );

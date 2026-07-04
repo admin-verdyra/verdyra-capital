@@ -1,7 +1,7 @@
 const reasons = [
-  'Specialist support for growing businesses and individuals.',
-  'Fast decisions with premium advisory and lending access.',
-  'Tailored capital strategies that fit your growth stage.',
+  "Specialist support for growing businesses and individuals.",
+  "Fast decisions with premium advisory and lending access.",
+  "Tailored capital strategies that fit your growth stage.",
 ];
 
 export default function WhyChooseVerdyra() {
@@ -16,13 +16,17 @@ export default function WhyChooseVerdyra() {
             Premium capital guidance for ambitious plans.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            Verdyra combines lending access, advisory depth, and fast execution so you can move from opportunity to funding with confidence.
+            Verdyra combines lending access, advisory depth, and fast execution
+            so you can move from opportunity to funding with confidence.
           </p>
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {reasons.map((reason) => (
-            <div key={reason} className="rounded-[20px] border border-slate-200 bg-[#F8FAF9] p-5">
+            <div
+              key={reason}
+              className="rounded-[20px] border border-slate-200 bg-[#F8FAF9] p-5"
+            >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F5A3A]/10 text-[#0F5A3A]">
                 ✓
               </div>

@@ -1,10 +1,10 @@
 const solutions = [
-  'Business Loan Providers',
-  'NBFC Network',
-  'Revenue-Based Financing',
-  'Invoice Financing',
-  'Structured Debt',
-  'Personal Lending',
+  "Business Loan Providers",
+  "NBFC Network",
+  "Revenue-Based Financing",
+  "Invoice Financing",
+  "Structured Debt",
+  "Personal Lending",
 ];
 
 export default function LendingNetwork() {
@@ -19,7 +19,8 @@ export default function LendingNetwork() {
             Financing Ecosystem
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            Verdyra Capital helps businesses access financing solutions through a network of banks, NBFCs and alternative financing institutions.
+            Verdyra Capital helps businesses access financing solutions through
+            a network of banks, NBFCs and alternative financing institutions.
           </p>
         </div>
 
@@ -35,7 +36,9 @@ export default function LendingNetwork() {
         </div>
 
         <div className="mt-10 rounded-[24px] border border-slate-200 bg-[#F8FAF9] p-6 sm:flex sm:items-center sm:justify-between">
-          <p className="text-lg font-medium text-slate-700">Interested in working with Verdyra?</p>
+          <p className="text-lg font-medium text-slate-700">
+            Interested in working with Verdyra?
+          </p>
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSeT7ZdQ6j1GNoI372-9VWBsFOdejJfgk7NLPnoiRFxBV1OQyg/viewform?usp=publish"
             target="_blank"

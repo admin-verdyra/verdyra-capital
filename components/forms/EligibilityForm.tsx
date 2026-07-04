@@ -1,68 +1,72 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 
-type LoanType = 'business' | 'personal';
+type LoanType = "business" | "personal";
 
 const businessCategories = [
-  'D2C Brand',
-  'Marketplace Seller',
-  'Manufacturer',
-  'Distributor',
-  'Retail',
-  'Restaurant',
-  'Healthcare',
-  'Logistics',
-  'SaaS',
-  'Services',
-  'Other',
+  "D2C Brand",
+  "Marketplace Seller",
+  "Manufacturer",
+  "Distributor",
+  "Retail",
+  "Restaurant",
+  "Healthcare",
+  "Logistics",
+  "SaaS",
+  "Services",
+  "Other",
 ];
 
-const turnoverOptions = ['₹1L - ₹5L',
-  '₹5L - ₹10L',
-  '₹10L - ₹25L',
-  '₹25L - ₹50L',
-  '₹50L - ₹1Cr',
-  '₹1Cr - ₹5Cr',
-  '₹5Cr+',];
-const vintageOptions = ['0 - 1 year', '1 - 3 years', '3 - 5 years', '5+ years'];
+const turnoverOptions = [
+  "₹1L - ₹5L",
+  "₹5L - ₹10L",
+  "₹10L - ₹25L",
+  "₹25L - ₹50L",
+  "₹50L - ₹1Cr",
+  "₹1Cr - ₹5Cr",
+  "₹5Cr+",
+];
+const vintageOptions = ["0 - 1 year", "1 - 3 years", "3 - 5 years", "5+ years"];
 
 export default function EligibilityForm() {
-  const [loanType, setLoanType] = useState<LoanType>('business');
-  const [businessCategory, setBusinessCategory] = useState(businessCategories[0]);
+  const [loanType, setLoanType] = useState<LoanType>("business");
+  const [businessCategory, setBusinessCategory] = useState(
+    businessCategories[0],
+  );
   const [monthlyTurnover, setMonthlyTurnover] = useState(turnoverOptions[1]);
   const [businessVintage, setBusinessVintage] = useState(vintageOptions[1]);
-  const [city, setCity] = useState('Mumbai');
-  const [businessName, setBusinessName] = useState('');
-  const [contactPerson, setContactPerson] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [emailAddress, setEmailAddress] = useState('');
+  const [city, setCity] = useState("Mumbai");
+  const [businessName, setBusinessName] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
   const indicativeFunding = useMemo(() => {
-  if (loanType === 'business') {
-    const fundingMap: Record<string, number> = {
-      '₹1L - ₹5L': 1000000,      // ₹10 Lakh
-      '₹5L - ₹10L': 2500000,     // ₹25 Lakh
-      '₹10L - ₹25L': 7500000,    // ₹75 Lakh
-      '₹25L - ₹50L': 15000000,   // ₹1.5 Crore
-      '₹50L - ₹1Cr': 30000000,   // ₹3 Crore
-      '₹1Cr - ₹5Cr': 100000000,  // ₹10 Crore
-      '₹5Cr+': 250000000,        // ₹25 Crore
-    };
+    if (loanType === "business") {
+      const fundingMap: Record<string, number> = {
+        "₹1L - ₹5L": 1000000, // ₹10 Lakh
+        "₹5L - ₹10L": 2500000, // ₹25 Lakh
+        "₹10L - ₹25L": 7500000, // ₹75 Lakh
+        "₹25L - ₹50L": 15000000, // ₹1.5 Crore
+        "₹50L - ₹1Cr": 30000000, // ₹3 Crore
+        "₹1Cr - ₹5Cr": 100000000, // ₹10 Crore
+        "₹5Cr+": 250000000, // ₹25 Crore
+      };
 
-    return fundingMap[monthlyTurnover] ?? 1000000;
-  }
+      return fundingMap[monthlyTurnover] ?? 1000000;
+    }
 
-  return 2500000; // ₹25 Lakh for personal loans (placeholder)
-}, [loanType, monthlyTurnover]);
+    return 2500000; // ₹25 Lakh for personal loans (placeholder)
+  }, [loanType, monthlyTurnover]);
 
-  const fundingLabel = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
+  const fundingLabel = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
     maximumFractionDigits: 0,
   }).format(indicativeFunding);
 
@@ -73,22 +77,22 @@ export default function EligibilityForm() {
     const trimmedEmail = emailAddress.trim();
 
     if (!trimmedName || !trimmedContact) {
-      return 'Please provide your business name and contact person.';
+      return "Please provide your business name and contact person.";
     }
 
     if (!/^\+?[0-9\s-]{10,15}$/.test(trimmedMobile)) {
-      return 'Please enter a valid mobile number.';
+      return "Please enter a valid mobile number.";
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      return 'Please enter a valid email address.';
+      return "Please enter a valid email address.";
     }
 
     if (!agreed) {
-      return 'Please agree to the terms and privacy policy.';
+      return "Please agree to the terms and privacy policy.";
     }
 
-    return '';
+    return "";
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -96,25 +100,25 @@ export default function EligibilityForm() {
 
     const validationError = validateForm();
     if (validationError) {
-      setStatus('error');
+      setStatus("error");
       setMessage(validationError);
       return;
     }
 
     try {
       setIsSubmitting(true);
-      setStatus('idle');
-      setMessage('');
+      setStatus("idle");
+      setMessage("");
 
-      const response = await fetch('/api/enquiries', {
-        method: 'POST',
+      const response = await fetch("/api/enquiries", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
-          _subject: 'New Verdyra Capital Eligibility Enquiry',
-          _captcha: 'false',
+          _subject: "New Verdyra Capital Eligibility Enquiry",
+          _captcha: "false",
           loanType,
           businessCategory,
           monthlyTurnover,
@@ -130,47 +134,53 @@ export default function EligibilityForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Submission failed');
+        throw new Error("Submission failed");
       }
 
-      setStatus('success');
-      setMessage('Thank you. Our advisory team will contact you shortly.');
+      setStatus("success");
+      setMessage("Thank you. Our advisory team will contact you shortly.");
     } catch (error) {
-      setStatus('error');
-      setMessage('We could not submit your enquiry right now. Please try again shortly.');
+      setStatus("error");
+      setMessage(
+        "We could not submit your enquiry right now. Please try again shortly.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form id="eligibility" onSubmit={handleSubmit} className="rounded-[32px] border border-emerald-900/10 bg-white p-6 shadow-[0_24px_80px_rgba(15,90,58,0.12)] sm:p-8">
+    <form
+      id="eligibility"
+      onSubmit={handleSubmit}
+      className="rounded-[32px] border border-emerald-900/10 bg-white p-6 shadow-[0_24px_80px_rgba(15,90,58,0.12)] sm:p-8"
+    >
       <div className="flex rounded-full bg-[#F3F7F4] p-1.5">
         <button
           type="button"
-          onClick={() => setLoanType('business')}
+          onClick={() => setLoanType("business")}
           className={`flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-            loanType === 'business'
-              ? 'bg-[#0F5A3A] text-white shadow-sm'
-              : 'text-[#0F5A3A]/80 hover:text-[#0F5A3A]'
+            loanType === "business"
+              ? "bg-[#0F5A3A] text-white shadow-sm"
+              : "text-[#0F5A3A]/80 hover:text-[#0F5A3A]"
           }`}
         >
           Business Funding
         </button>
         <button
           type="button"
-          onClick={() => setLoanType('personal')}
+          onClick={() => setLoanType("personal")}
           className={`flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
-            loanType === 'personal'
-              ? 'bg-[#0F5A3A] text-white shadow-sm'
-              : 'text-[#0F5A3A]/80 hover:text-[#0F5A3A]'
+            loanType === "personal"
+              ? "bg-[#0F5A3A] text-white shadow-sm"
+              : "text-[#0F5A3A]/80 hover:text-[#0F5A3A]"
           }`}
         >
           Personal Loan
         </button>
       </div>
 
-      {loanType === 'business' ? (
+      {loanType === "business" ? (
         <div className="mt-6 space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -272,7 +282,9 @@ export default function EligibilityForm() {
       )}
 
       <div className="mt-6 rounded-[24px] border border-[#0F5A3A]/10 bg-[#F8FAF9] p-5">
-        <p className="text-sm font-medium text-[#0F5A3A]">Estimated Eligible Funding</p>
+        <p className="text-sm font-medium text-[#0F5A3A]">
+          Estimated Eligible Funding
+        </p>
         <p className="mt-2 text-5xl font-semibold tracking-tight text-[#111111] sm:text-6xl">
           {fundingLabel}
         </p>
@@ -285,7 +297,8 @@ export default function EligibilityForm() {
           </div>
         </div>
         <p className="mt-3 text-sm text-slate-600">
-          Estimated eligibility based on your selected business profile. Final approval is subject to lender assessment.
+          Estimated eligibility based on your selected business profile. Final
+          approval is subject to lender assessment.
         </p>
       </div>
 
@@ -339,15 +352,15 @@ export default function EligibilityForm() {
           </div>
         </div>
 
-       <label
-  style={{
-    display: "grid",
-    gridTemplateColumns: "20px 1fr",
-    columnGap: "12px",
-    alignItems: "start",
-  }}
-  className="w-full rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600"
->
+        <label
+          style={{
+            display: "grid",
+            gridTemplateColumns: "20px 1fr",
+            columnGap: "12px",
+            alignItems: "start",
+          }}
+          className="w-full rounded-2xl border border-slate-200 bg-[#F8FAF9] px-4 py-3 text-sm text-slate-600"
+        >
           <input
             type="checkbox"
             checked={agreed}
@@ -355,15 +368,22 @@ export default function EligibilityForm() {
             className="mt-0 h-4 w-4 flex-none rounded border-slate-300 text-[#0F5A3A] focus:ring-[#0F5A3A]"
           />
           <span className="flex-1 min-w-0 leading-[1.55]">
-            I agree to the{' '}
-            <a href="/terms-and-conditions" className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline">
+            I agree to the{" "}
+            <a
+              href="/terms-and-conditions"
+              className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline"
+            >
               Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="/privacy-policy" className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline">
+            </a>{" "}
+            and{" "}
+            <a
+              href="/privacy-policy"
+              className="font-medium text-[#0F6B47] transition-colors hover:text-[#C89B3C] hover:underline"
+            >
               Privacy Policy
             </a>
-            , and consent to being contacted by Verdyra Capital and its lending partners regarding my financing enquiry.
+            , and consent to being contacted by Verdyra Capital and its lending
+            partners regarding my financing enquiry.
           </span>
         </label>
 
@@ -372,16 +392,16 @@ export default function EligibilityForm() {
           disabled={isSubmitting}
           className="w-full rounded-full bg-[#B8860B] px-5 py-3.5 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#9f6f08] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isSubmitting ? 'Submitting…' : 'Submit Enquiry'}
+          {isSubmitting ? "Submitting…" : "Submit Enquiry"}
         </button>
 
         {message ? (
           <div
             aria-live="polite"
             className={`rounded-2xl border px-4 py-3 text-sm ${
-              status === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                : 'border-rose-200 bg-rose-50 text-rose-700'
+              status === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                : "border-rose-200 bg-rose-50 text-rose-700"
             }`}
           >
             {message}
