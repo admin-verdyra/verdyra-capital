@@ -26,15 +26,16 @@ export default function ReviewPreviewModal({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!open || !document) return;
+    if (!open || !document) {
+      setUrl("");
+      return;
+    }
 
-    async function load() {
+    async function load(doc: CustomerDocument) {
       try {
         setLoading(true);
 
-        const signed = await getSignedUrl(
-          document.file_path
-        );
+        const signed = await getSignedUrl(doc.file_path);
 
         setUrl(signed);
       } finally {
@@ -42,20 +43,20 @@ export default function ReviewPreviewModal({
       }
     }
 
-    load();
+    load(document);
   }, [open, document]);
 
-  if (!open || !document) return null;
+  if (!open || !document) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-8">
-
       <div className="flex h-[90vh] w-full max-w-7xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl">
 
         <div className="flex items-center justify-between border-b px-8 py-6">
 
           <div>
-
             <h2 className="text-2xl font-bold">
               {document.file_name}
             </h2>
@@ -63,7 +64,6 @@ export default function ReviewPreviewModal({
             <p className="mt-1 text-slate-500">
               {document.document_type}
             </p>
-
           </div>
 
           <div className="flex items-center gap-3">
@@ -112,14 +112,11 @@ export default function ReviewPreviewModal({
 
           {loading ? (
             <div className="flex items-center gap-3">
-
               <Loader2
                 className="animate-spin"
                 size={24}
               />
-
               <span>Loading Preview...</span>
-
             </div>
           ) : url ? (
             <iframe
@@ -134,7 +131,6 @@ export default function ReviewPreviewModal({
         </div>
 
       </div>
-
     </div>
   );
 }
