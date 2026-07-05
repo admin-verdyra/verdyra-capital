@@ -36,23 +36,27 @@ export async function uploadDocument(
     throw uploadError;
   }
 
-  const { error: dbError } = await supabase
-    .from("customer_documents")
-    .upsert({
-      customer_username: username,
-      document_type: documentType,
-      file_name: file.name,
-      file_path: storagePath,
-      status: "Pending",
-      uploaded_at: new Date().toISOString(),
-      reviewed_at: null,
-      reviewed_by: null,
-      remarks: null,
-    });
+  const { data, error: dbError } = await supabase
+  .from("customer_documents")
+  .insert({
+    customer_username: username,
+    document_type: documentType,
+    file_name: file.name,
+    file_path: storagePath,
+    status: "Pending",
+    uploaded_at: new Date().toISOString(),
+    reviewed_at: null,
+    reviewed_by: null,
+    remarks: null,
+  })
+  .select();
 
-  if (dbError) {
-    throw dbError;
-  }
+console.log("DB INSERT RESULT:", data);
+
+if (dbError) {
+  console.error("DB INSERT ERROR:", dbError);
+  throw dbError;
+}
 }
 
 export async function getCustomerDocuments(

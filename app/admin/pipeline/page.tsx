@@ -1,3 +1,7 @@
+"use client";
+
+import { PipelinePage } from "@/components/admin/pipeline";
+
 export default function Page() {
-  return <div>Coming Soon</div>;
+  return <PipelinePage />;
 }

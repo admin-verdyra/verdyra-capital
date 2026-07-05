@@ -3,64 +3,54 @@
 import { useEffect, useState } from "react";
 import {
   X,
+  Loader2,
   ExternalLink,
   Download,
-  Loader2,
 } from "lucide-react";
 
-import useDocuments from "./useDocuments";
-
+import { getSignedUrl } from "@/lib/documents/documentService";
 import type { CustomerDocument } from "@/lib/documents/documentService";
 
 type Props = {
-  document: CustomerDocument | null;
   open: boolean;
+  document: CustomerDocument | null;
   onClose: () => void;
 };
 
-export default function DocumentPreview({
-  document,
+export default function ReviewPreviewModal({
   open,
+  document,
   onClose,
 }: Props) {
-  const { getPreviewUrl } = useDocuments();
-
   const [url, setUrl] = useState("");
-
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!open || !document) return;
 
-    async function loadPreview() {
+    async function load() {
       try {
         setLoading(true);
 
-        const signedUrl =
-          await getPreviewUrl(
-            document.file_path
-          );
+        const signed = await getSignedUrl(
+          document.file_path
+        );
 
-        setUrl(signedUrl);
+        setUrl(signed);
       } finally {
         setLoading(false);
       }
     }
 
-    loadPreview();
+    load();
   }, [open, document]);
 
-  if (!open || !document) {
-    return null;
-  }
+  if (!open || !document) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-8">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-8">
 
-      <div className="flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl">
-
-        {/* Header */}
+      <div className="flex h-[90vh] w-full max-w-7xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl">
 
         <div className="flex items-center justify-between border-b px-8 py-6">
 
@@ -70,7 +60,7 @@ export default function DocumentPreview({
               {document.file_name}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-slate-500">
               {document.document_type}
             </p>
 
@@ -84,23 +74,25 @@ export default function DocumentPreview({
                   href={url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-medium hover:bg-slate-50"
+                  className="rounded-xl border px-5 py-3 text-sm font-semibold hover:bg-slate-50"
                 >
-                  <ExternalLink size={18} />
-
+                  <ExternalLink
+                    size={16}
+                    className="mr-2 inline"
+                  />
                   Open
-
                 </a>
 
                 <a
                   href={url}
                   download
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#0F5A3A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0B4B31]"
+                  className="rounded-xl bg-[#0F5A3A] px-5 py-3 text-sm font-semibold text-white"
                 >
-                  <Download size={18} />
-
+                  <Download
+                    size={16}
+                    className="mr-2 inline"
+                  />
                   Download
-
                 </a>
               </>
             )}
@@ -116,41 +108,27 @@ export default function DocumentPreview({
 
         </div>
 
-        {/* Preview */}
-
         <div className="flex flex-1 items-center justify-center bg-slate-100">
 
           {loading ? (
             <div className="flex items-center gap-3">
 
               <Loader2
-                size={24}
                 className="animate-spin"
+                size={24}
               />
 
-              <span className="font-medium">
-                Loading Preview...
-              </span>
+              <span>Loading Preview...</span>
 
             </div>
           ) : url ? (
             <iframe
               src={url}
               className="h-full w-full"
-              title="Document Preview"
+              title="Preview"
             />
           ) : (
-            <div className="text-center">
-
-              <p className="text-lg font-semibold">
-                Unable to load preview.
-              </p>
-
-              <p className="mt-2 text-slate-500">
-                Please try again later.
-              </p>
-
-            </div>
+            <div>No Preview Available</div>
           )}
 
         </div>
