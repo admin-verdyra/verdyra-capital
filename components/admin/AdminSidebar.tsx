@@ -4,58 +4,68 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Users,
   FolderOpen,
-  Bell,
-  User,
+  GitBranch,
+  Settings,
   LogOut,
   ChevronRight,
 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 const navItems = [
   {
     title: "Dashboard",
-    href: "/portal/dashboard",
+    href: "/admin/dashboard",
     icon: LayoutDashboard,
   },
   {
+    title: "Customers",
+    href: "/admin/customers",
+    icon: Users,
+  },
+  {
     title: "Documents",
-    href: "/portal/documents",
+    href: "/admin/documents",
     icon: FolderOpen,
   },
   {
-    title: "Notifications",
-    href: "/portal/notifications",
-    icon: Bell,
+    title: "Pipeline",
+    href: "/admin/pipeline",
+    icon: GitBranch,
   },
   {
-    title: "Profile",
-    href: "/portal/profile",
-    icon: User,
+    title: "Settings",
+    href: "/admin/settings",
+    icon: Settings,
   },
 ];
 
-export default function PortalSidebar() {
+export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+function logout() {
+  sessionStorage.removeItem("admin");
+  router.replace("/admin");
+}
 
   return (
-    <aside className="hidden lg:flex w-72 shrink-0 flex-col bg-gradient-to-b from-[#0F5A3A] to-[#0A402A] text-white shadow-2xl">
-
-      {/* Logo */}
+    <aside className="hidden lg:flex w-72 shrink-0 flex-col bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 text-white shadow-2xl">
 
       <Link
-  href="/portal"
-  className="block border-b border-white/10 px-8 py-8 transition hover:bg-white/5"
->
-  <h1 className="text-3xl font-bold tracking-tight">
-    Verdyra
-  </h1>
+        href="/admin/dashboard"
+        className="border-b border-white/10 px-8 py-8 transition hover:bg-white/5"
+      >
+        <h1 className="text-3xl font-bold">
+          Verdyra
+        </h1>
 
-  <p className="mt-2 text-sm text-white/70">
-    Customer Portal
-  </p>
-</Link>
-
-      {/* Navigation */}
+        <p className="mt-2 text-sm text-white/60">
+          Admin Portal
+        </p>
+      </Link>
 
       <nav className="flex-1 px-5 py-6">
 
@@ -76,7 +86,7 @@ export default function PortalSidebar() {
                 href={item.href}
                 className={`group flex items-center justify-between rounded-2xl px-4 py-4 transition-all duration-300 ${
                   active
-                    ? "bg-white text-[#0F5A3A] shadow-lg"
+                    ? "bg-white text-slate-900 shadow-lg"
                     : "text-white/80 hover:bg-white/10 hover:text-white"
                 }`}
               >
@@ -107,21 +117,19 @@ export default function PortalSidebar() {
 
       </nav>
 
-      {/* Footer */}
-
       <div className="border-t border-white/10 p-6">
 
-        <Link
-          href="/"
-          className="flex items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 font-semibold text-[#0F5A3A] transition hover:scale-[1.02] hover:bg-slate-100"
-        >
-          <LogOut size={18} />
+  <button
+    onClick={logout}
+    className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 font-semibold text-slate-900 transition hover:scale-[1.02]"
+  >
+    <LogOut size={18} />
 
-          Exit Portal
-        </Link>
+    Logout
 
-      </div>
+  </button>
 
-    </aside>
+</div>
+</aside>
   );
 }
