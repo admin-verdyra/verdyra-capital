@@ -26,21 +26,21 @@ export default function DocumentPreview({
   const { getPreviewUrl } = useDocuments();
 
   const [url, setUrl] = useState("");
-
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!open || !document) return;
+    if (!open || !document) {
+      setUrl("");
+      return;
+    }
 
-    async function loadPreview() {
+    async function loadPreview(doc: CustomerDocument) {
       try {
         setLoading(true);
 
-        const signedUrl =
-          await getPreviewUrl(
-            document.file_path
-          );
+        const signedUrl = await getPreviewUrl(
+          doc.file_path
+        );
 
         setUrl(signedUrl);
       } finally {
@@ -48,8 +48,8 @@ export default function DocumentPreview({
       }
     }
 
-    loadPreview();
-  }, [open, document]);
+    loadPreview(document);
+  }, [open, document, getPreviewUrl]);
 
   if (!open || !document) {
     return null;
@@ -57,15 +57,11 @@ export default function DocumentPreview({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-8">
-
       <div className="flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl">
-
-        {/* Header */}
 
         <div className="flex items-center justify-between border-b px-8 py-6">
 
           <div>
-
             <h2 className="text-2xl font-bold">
               {document.file_name}
             </h2>
@@ -73,7 +69,6 @@ export default function DocumentPreview({
             <p className="mt-1 text-sm text-slate-500">
               {document.document_type}
             </p>
-
           </div>
 
           <div className="flex items-center gap-3">
@@ -87,9 +82,7 @@ export default function DocumentPreview({
                   className="inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-medium hover:bg-slate-50"
                 >
                   <ExternalLink size={18} />
-
                   Open
-
                 </a>
 
                 <a
@@ -98,9 +91,7 @@ export default function DocumentPreview({
                   className="inline-flex items-center gap-2 rounded-xl bg-[#0F5A3A] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0B4B31]"
                 >
                   <Download size={18} />
-
                   Download
-
                 </a>
               </>
             )}
@@ -116,13 +107,10 @@ export default function DocumentPreview({
 
         </div>
 
-        {/* Preview */}
-
         <div className="flex flex-1 items-center justify-center bg-slate-100">
 
           {loading ? (
             <div className="flex items-center gap-3">
-
               <Loader2
                 size={24}
                 className="animate-spin"
@@ -131,7 +119,6 @@ export default function DocumentPreview({
               <span className="font-medium">
                 Loading Preview...
               </span>
-
             </div>
           ) : url ? (
             <iframe
@@ -141,7 +128,6 @@ export default function DocumentPreview({
             />
           ) : (
             <div className="text-center">
-
               <p className="text-lg font-semibold">
                 Unable to load preview.
               </p>
@@ -149,14 +135,12 @@ export default function DocumentPreview({
               <p className="mt-2 text-slate-500">
                 Please try again later.
               </p>
-
             </div>
           )}
 
         </div>
 
       </div>
-
     </div>
   );
 }

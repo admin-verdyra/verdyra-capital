@@ -74,7 +74,7 @@ export default function UploadDocumentModal({
 
       await uploadCustomerDocument(
         customer.username,
-        documentType,
+        documentType!,
         file
       );
 
