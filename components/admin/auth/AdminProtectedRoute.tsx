@@ -13,14 +13,40 @@ export default function AdminProtectedRoute({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const admin = sessionStorage.getItem("admin");
+    async function verifyAdminSession() {
+      const response = await fetch(
+        "/api/admin/auth/session",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
 
-    if (!admin) {
-      router.replace("/admin");
-      return;
+      if (!response.ok) {
+        sessionStorage.removeItem("admin");
+        router.replace("/admin");
+        return;
+      }
+
+      const result = await response.json();
+
+      if (!result.success || !result.admin) {
+        sessionStorage.removeItem("admin");
+        router.replace("/admin");
+        return;
+      }
+
+      sessionStorage.setItem(
+        "admin",
+        JSON.stringify(result.admin)
+      );
+
+      setLoading(false);
     }
 
-    setLoading(false);
+    verifyAdminSession();
   }, [router]);
 
   if (loading) {

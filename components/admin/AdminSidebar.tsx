@@ -46,7 +46,11 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-function logout() {
+async function logout() {
+  await fetch("/api/admin/auth/logout", {
+    method: "POST",
+  });
+
   sessionStorage.removeItem("admin");
   router.replace("/admin");
 }

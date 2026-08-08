@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginAdmin } from "@/lib/admin/auth";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -23,18 +22,30 @@ export default function AdminLogin() {
 
     setLoading(true);
 
-    const admin = await loginAdmin(username, password);
+    const response = await fetch("/api/admin/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+
+    const result = await response.json();
 
     setLoading(false);
 
-    if (!admin) {
-      setError("Invalid credentials.");
+    if (!response.ok || !result.success) {
+      setError(result.message ?? "Invalid credentials.");
       return;
     }
 
     sessionStorage.setItem(
       "admin",
-      JSON.stringify(admin)
+      JSON.stringify(result.admin)
     );
 
     router.push("/admin/dashboard");

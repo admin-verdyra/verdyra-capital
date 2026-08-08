@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase";
 
 export type Customer = {
+  auth_user_id?: string | null;
+
   username: string;
   password: string;
 
