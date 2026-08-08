@@ -563,6 +563,136 @@ export async function PATCH(request: Request) {
   }
 }
 
+export async function DELETE(request: Request) {
+  try {
+    try {
+      await requireAdmin();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Admin authentication required.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const username = searchParams.get("username")?.toString().trim();
+
+    if (!validateUsername(username)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Valid username is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createSupabaseServiceRoleClient();
+
+    const { data: customer, error: customerError } = await supabase
+      .from("customers")
+      .select("id, username, auth_user_id")
+      .eq("username", username)
+      .maybeSingle();
+
+    if (customerError && customerError.code !== "PGRST116") {
+      throw customerError;
+    }
+
+    if (!customer) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Customer not found.",
+        },
+        { status: 404 }
+      );
+    }
+
+    const { data: documents, error: documentsError } = await supabase
+      .from("customer_documents")
+      .select("file_path")
+      .eq("customer_username", username);
+
+    if (documentsError) {
+      throw documentsError;
+    }
+
+    const filePaths = Array.isArray(documents)
+      ? [...new Set(documents.map((doc) => doc.file_path).filter(Boolean))]
+      : [];
+
+    if (filePaths.length > 0) {
+      const { error: storageError } = await supabase
+        .storage
+        .from("documents")
+        .remove(filePaths);
+
+      if (storageError) {
+        console.error("Storage deletion failed:", storageError);
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Failed to delete customer documents from storage.",
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    const { error: deleteDocsError } = await supabase
+      .from("customer_documents")
+      .delete()
+      .eq("customer_username", username);
+
+    if (deleteDocsError) {
+      throw deleteDocsError;
+    }
+
+    if (customer.auth_user_id) {
+      try {
+        await deleteSupabaseAuthUser(customer.auth_user_id);
+      } catch (authError) {
+        console.error("Auth deletion failed:", authError);
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Failed to delete authentication account.",
+          },
+          { status: 500 }
+        );
+      }
+    }
+
+    const { error: deleteCustomerError } = await supabase
+      .from("customers")
+      .delete()
+      .eq("username", username);
+
+    if (deleteCustomerError) {
+      throw deleteCustomerError;
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Customer deleted successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Customer deletion could not be completed.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     // 1. Verify authenticated admin

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import type { Customer } from "@/components/portal/types";
-import { updateCustomer } from "@/lib/admin/customers";
+import { deleteCustomer, updateCustomer } from "@/lib/admin/customers";
 
 type Props = {
   customer: Customer | null;
@@ -33,6 +33,8 @@ export default function CustomerDetailsDrawer({
   onClose,
 }: Props) {
   const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmationInput, setDeleteConfirmationInput] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<Partial<Customer>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -110,6 +112,27 @@ export default function CustomerDetailsDrawer({
       setSaveError(error.message || "Failed to update customer");
     } finally {
       setUpdating(false);
+    }
+  }
+
+  async function handleDeleteCustomer() {
+    if (!customer) return;
+
+    if (deleteConfirmationInput !== customer.username) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await deleteCustomer(customer.username);
+      window.location.reload();
+    } catch (err) {
+      const error = err as Error;
+      console.error(error);
+      alert(error.message || "Failed to delete customer");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -423,7 +446,7 @@ export default function CustomerDetailsDrawer({
                 <button
                   className="rounded-2xl border border-red-300 text-red-700 py-4 font-semibold hover:bg-red-50"
                   onClick={() => handleAccountStatusChange('disabled')}
-                  disabled={updating || editMode}
+                  disabled={updating || deleting || editMode}
                 >
                   {updating ? 'Disabling...' : 'Disable Account'}
                 </button>
@@ -431,11 +454,43 @@ export default function CustomerDetailsDrawer({
                 <button
                   className="rounded-2xl border border-green-300 text-green-700 py-4 font-semibold hover:bg-green-50"
                   onClick={() => handleAccountStatusChange('active')}
-                  disabled={updating || editMode}
+                  disabled={updating || deleting || editMode}
                 >
                   {updating ? 'Enabling...' : 'Enable Account'}
                 </button>
               )}
+
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold text-red-800">Delete Customer?</p>
+                  <p className="text-sm text-slate-600">
+                    This will permanently delete the customer, their login access, uploaded documents, and stored files. This action cannot be undone.
+                  </p>
+                  <label className="block text-sm font-medium text-slate-900">
+                    Type the customer's exact username to confirm
+                  </label>
+                  <input
+                    type="text"
+                    value={deleteConfirmationInput}
+                    onChange={(event) => setDeleteConfirmationInput(event.target.value)}
+                    className="w-full rounded-xl border border-red-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+                    placeholder={customer.username}
+                    disabled={deleting}
+                  />
+                  <button
+                    className="w-full rounded-2xl bg-red-600 py-4 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={handleDeleteCustomer}
+                    disabled={
+                      updating ||
+                      deleting ||
+                      editMode ||
+                      deleteConfirmationInput !== customer.username
+                    }
+                  >
+                    {deleting ? 'Deleting...' : 'Delete Customer'}
+                  </button>
+                </div>
+              </div>
 
             </div>
           </div>

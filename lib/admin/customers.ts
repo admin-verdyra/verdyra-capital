@@ -112,3 +112,18 @@ export async function updateCustomer(
 
   return result.customer;
 }
+
+export async function deleteCustomer(username: string): Promise<void> {
+  const response = await fetch(
+    `/api/admin/customers?username=${encodeURIComponent(username)}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to delete customer");
+  }
+}
