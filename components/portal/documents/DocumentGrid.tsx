@@ -34,6 +34,16 @@ const requiredDocuments = [
     type: "additional",
     label: "Additional Documents",
   },
+  {
+    type: "debt_profile",
+    label: "Debt Profile",
+    templateUrl: "/templates/Debt%20profile.xlsx",
+  },
+  {
+    type: "mis",
+    label: "MIS",
+    templateUrl: "/templates/MIS%20Format.xlsx",
+  },
 ];
 
 export default function DocumentGrid({
@@ -56,6 +66,7 @@ export default function DocumentGrid({
             document={uploaded}
             onUpload={onUpload}
             onPreview={onPreview}
+            templateUrl={item.templateUrl}
           />
         );
       })}

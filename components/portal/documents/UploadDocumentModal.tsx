@@ -19,6 +19,32 @@ const ALLOWED_TYPES = [
   "image/jpg",
 ];
 
+const EXCEL_TYPES = [
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.ms-excel", // .xls
+];
+
+function getAllowedTypes(documentType: string) {
+  if (documentType === "debt_profile" || documentType === "mis") {
+    return [...ALLOWED_TYPES, ...EXCEL_TYPES];
+  }
+  return ALLOWED_TYPES;
+}
+
+function getAcceptString(documentType: string) {
+  if (documentType === "debt_profile" || documentType === "mis") {
+    return ".pdf,.jpg,.jpeg,.png,.xlsx,.xls";
+  }
+  return ".pdf,.jpg,.jpeg,.png";
+}
+
+function getFileTypeDescription(documentType: string) {
+  if (documentType === "debt_profile" || documentType === "mis") {
+    return "PDF, JPG, PNG, XLSX or XLS";
+  }
+  return "PDF, JPG or PNG";
+}
+
 export default function UploadDocumentModal({
   open,
   documentType,
@@ -48,11 +74,13 @@ export default function UploadDocumentModal({
 
     setError("");
 
+    const allowedTypes = getAllowedTypes(documentType!);
+
     if (
-      !ALLOWED_TYPES.includes(file.type)
+      !allowedTypes.includes(file.type)
     ) {
       setError(
-        "Only PDF, JPG and PNG files are allowed."
+        `Only ${getFileTypeDescription(documentType!)} files are allowed.`
       );
 
       return;
@@ -135,7 +163,7 @@ export default function UploadDocumentModal({
           </h3>
 
           <p className="mt-2 text-slate-500">
-            PDF, JPG or PNG
+            {getFileTypeDescription(documentType!)}
           </p>
 
         </button>
@@ -144,7 +172,7 @@ export default function UploadDocumentModal({
           ref={inputRef}
           type="file"
           hidden
-          accept=".pdf,.jpg,.jpeg,.png"
+          accept={getAcceptString(documentType!)}
           onChange={(e) => {
             const file =
               e.target.files?.[0];

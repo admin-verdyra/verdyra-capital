@@ -8,6 +8,7 @@ import {
   Clock3,
   XCircle,
   RotateCcw,
+  Download,
 } from "lucide-react";
 
 import type { CustomerDocument } from "@/lib/documents/documentService";
@@ -18,6 +19,7 @@ type Props = {
   document?: CustomerDocument;
   onUpload: (documentType: string) => void;
   onPreview: (document: CustomerDocument) => void;
+  templateUrl?: string;
 };
 
 export default function DocumentCard({
@@ -26,6 +28,7 @@ export default function DocumentCard({
   document,
   onUpload,
   onPreview,
+  templateUrl,
 }: Props) {
   function renderStatus() {
     if (!document) {
@@ -68,6 +71,17 @@ export default function DocumentCard({
             Pending
           </span>
         );
+    }
+  }
+
+  function handleDownloadTemplate() {
+    if (templateUrl) {
+      const link = window.document.createElement("a");
+      link.href = templateUrl;
+      link.download = "";
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
     }
   }
 
@@ -116,18 +130,37 @@ export default function DocumentCard({
               Replace
             </button>
 
+            {templateUrl && (
+              <button
+                onClick={handleDownloadTemplate}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 font-medium hover:bg-slate-50"
+              >
+                <Download size={18} />
+                Download Template
+              </button>
+            )}
+
           </div>
         </>
       ) : (
-        <button
-          onClick={() => onUpload(documentType)}
-          className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-[#0F5A3A] py-4 font-semibold text-white transition hover:bg-[#0B4B31]"
-        >
-          <Upload size={18} />
-
-          Upload Document
-
-        </button>
+        <div className="mt-8 space-y-3">
+          {templateUrl && (
+            <button
+              onClick={handleDownloadTemplate}
+              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-300 py-4 font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <Download size={18} />
+              Download Template
+            </button>
+          )}
+          <button
+            onClick={() => onUpload(documentType)}
+            className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#0F5A3A] py-4 font-semibold text-white transition hover:bg-[#0B4B31]"
+          >
+            <Upload size={18} />
+            Upload Document
+          </button>
+        </div>
       )}
 
     </div>

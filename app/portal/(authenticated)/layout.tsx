@@ -3,8 +3,19 @@
 import type { ReactNode } from "react";
 
 import AuthGuard from "@/components/portal/AuthGuard";
-import { PortalProvider } from "@/components/portal/PortalProvider";
+import { PortalProvider, usePortal } from "@/components/portal/PortalProvider";
 import PortalShell from "@/components/layout/PortalShell";
+
+function PortalShellWrapper({ children }: { children: ReactNode }) {
+  const { customer } = usePortal();
+  const customerName = customer?.full_name ?? "Customer";
+
+  return (
+    <PortalShell customerName={customerName}>
+      {children}
+    </PortalShell>
+  );
+}
 
 export default function PortalLayout({
   children,
@@ -14,9 +25,9 @@ export default function PortalLayout({
   return (
     <PortalProvider>
       <AuthGuard>
-        <PortalShell customerName="Himanshu Chauhan">
+        <PortalShellWrapper>
           {children}
-        </PortalShell>
+        </PortalShellWrapper>
       </AuthGuard>
     </PortalProvider>
   );
