@@ -62,3 +62,53 @@ export async function assignRelationshipManager(
     throw error;
   }
 }
+
+export async function updateAccountStatus(
+  username: string,
+  accountStatus: 'active' | 'disabled'
+) {
+  const { error } = await supabase
+    .from("customers")
+    .update({
+      account_status: accountStatus,
+    })
+    .eq("username", username);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export type UpdateCustomerData = {
+  full_name?: string;
+  email?: string;
+  phone?: string | null;
+  company?: string | null;
+  date_of_birth?: string | null;
+  loan_amount?: number | null;
+  product?: string | null;
+  application_status?: string | null;
+  relationship_manager?: string | null;
+  relationship_manager_phone?: string | null;
+  expected_approval_date?: string | null;
+  progress?: number | null;
+};
+
+export async function updateCustomer(
+  username: string,
+  data: UpdateCustomerData
+): Promise<Customer> {
+  const response = await fetch("/api/admin/customers", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, ...data }),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to update customer");
+  }
+
+  return result.customer;
+}

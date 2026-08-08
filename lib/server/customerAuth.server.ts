@@ -32,6 +32,7 @@ type CustomerRecord = {
   loan_amount: number | null;
   product: string | null;
   application_status: string | null;
+  account_status: 'active' | 'disabled';
   relationship_manager: string | null;
   relationship_manager_phone: string | null;
   expected_approval_date: string | null;
@@ -83,7 +84,7 @@ export async function getCustomerByUsername(
   const { data, error } = await supabase
     .from("customers")
     .select(
-      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, relationship_manager, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
+      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
     )
     .eq("username", username.trim())
     .maybeSingle<CustomerRecord>();
@@ -103,7 +104,7 @@ export async function getCustomerByAuthUserId(
   const { data, error } = await supabase
     .from("customers")
     .select(
-      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, relationship_manager, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
+      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
     )
     .eq("auth_user_id", authUserId)
     .maybeSingle<CustomerRecord>();
@@ -169,6 +170,10 @@ export async function loginCustomerWithSupabaseAuth(
     );
   }
 
+  if (customer.account_status !== 'active') {
+    return null;
+  }
+
   const session = await signInCustomerWithSupabaseAuth(
     customer.email,
     password
@@ -196,6 +201,10 @@ export async function getCustomerFromAccessToken(
   const customer = await getCustomerByAuthUserId(user.id);
 
   if (!customer) {
+    return null;
+  }
+
+  if (customer.account_status !== 'active') {
     return null;
   }
 

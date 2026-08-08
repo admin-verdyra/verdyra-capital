@@ -144,7 +144,11 @@ export default function CustomerTable() {
               </th>
 
               <th className="px-6 py-4 text-left">
-                Status
+                Application Status
+              </th>
+
+              <th className="px-6 py-4 text-left">
+                Account Status
               </th>
 
               <th className="px-6 py-4 text-left">
@@ -203,6 +207,19 @@ export default function CustomerTable() {
 
                   </span>
 
+                </td>
+
+                <td className="px-6 py-5">
+                  <span
+                    className={
+                      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium " +
+                      (customer.account_status === 'active'
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800")
+                    }
+                  >
+                    {customer.account_status === 'active' ? 'Active' : 'Disabled'}
+                  </span>
                 </td>
 
                 <td className="px-6 py-5">

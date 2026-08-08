@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/server/adminAuth.server";
 import {
   createSupabaseAuthUser,
   deleteSupabaseAuthUser,
+  findSupabaseAuthUserByEmail,
 } from "@/lib/server/supabaseAuth.server";
 import { createSupabaseServiceRoleClient } from "@/lib/server/supabase.server";
 
@@ -23,6 +24,27 @@ type CreateCustomerRequest = {
   progress?: unknown;
 };
 
+type UpdateCustomerRequest = {
+  username?: unknown;
+  full_name?: unknown;
+  email?: unknown;
+  phone?: unknown;
+  company?: unknown;
+  date_of_birth?: unknown;
+  loan_amount?: unknown;
+  product?: unknown;
+  application_status?: unknown;
+  relationship_manager?: unknown;
+  relationship_manager_phone?: unknown;
+  expected_approval_date?: unknown;
+  progress?: unknown;
+};
+
+type UpdateAccountStatusRequest = {
+  username?: unknown;
+  account_status?: unknown;
+};
+
 type SafeCustomer = {
   id: string;
   username: string;
@@ -30,9 +52,11 @@ type SafeCustomer = {
   email: string;
   company: string | null;
   phone: string | null;
+  date_of_birth: string | null;
   relationship_manager: string | null;
   relationship_manager_phone: string | null;
   auth_user_id: string;
+  account_status: 'active' | 'disabled';
 };
 
 function validateEmail(email: unknown): email is string {
@@ -63,6 +87,34 @@ function validateUsername(username: unknown): username is string {
   );
 }
 
+function validateDate(date: unknown): date is string {
+  if (typeof date !== "string") {
+    return false;
+  }
+  // Validate YYYY-MM-DD format
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(date)) {
+    return false;
+  }
+  // Validate it's a real date
+  const d = new Date(date);
+  return !isNaN(d.getTime());
+}
+
+function validateProgress(progress: unknown): progress is number {
+  if (typeof progress !== "number") {
+    return false;
+  }
+  return Number.isInteger(progress) && progress >= 0 && progress <= 100;
+}
+
+function validateLoanAmount(amount: unknown): amount is number {
+  if (typeof amount !== "number") {
+    return false;
+  }
+  return amount > 0;
+}
+
 function toSafeCustomer(data: {
   id: string;
   username: string;
@@ -70,9 +122,11 @@ function toSafeCustomer(data: {
   email: string;
   company: string | null;
   phone: string | null;
+  date_of_birth: string | null;
   relationship_manager: string | null;
   relationship_manager_phone: string | null;
   auth_user_id: string;
+  account_status: 'active' | 'disabled';
 }): SafeCustomer {
   return {
     id: data.id,
@@ -81,10 +135,432 @@ function toSafeCustomer(data: {
     email: data.email,
     company: data.company,
     phone: data.phone,
+    date_of_birth: data.date_of_birth,
     relationship_manager: data.relationship_manager,
     relationship_manager_phone: data.relationship_manager_phone,
     auth_user_id: data.auth_user_id,
+    account_status: data.account_status,
   };
+}
+
+function validateAccountStatus(status: unknown): status is 'active' | 'disabled' {
+  return status === 'active' || status === 'disabled';
+}
+
+export async function PATCH(request: Request) {
+  try {
+    // 1. Verify authenticated admin
+    try {
+      await requireAdmin();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Admin authentication required.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // 2. Validate request data
+    const body = await request.json();
+
+    // Check if this is an account_status update (discriminator)
+    const hasAccountStatus = 'account_status' in body;
+    const hasCustomerFields = Object.keys(body).some(
+      (k) => k !== 'username' && k !== 'account_status'
+    );
+
+    // Handle account status update
+    if (hasAccountStatus && !hasCustomerFields) {
+      const body_typed = body as UpdateAccountStatusRequest;
+
+      const username = body_typed.username?.toString().trim();
+      const accountStatus = body_typed.account_status;
+
+      if (!username) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Username is required.",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (!validateAccountStatus(accountStatus)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Invalid account status. Must be 'active' or 'disabled'.",
+          },
+          { status: 400 }
+        );
+      }
+
+      // Update account status
+      const supabase = createSupabaseServiceRoleClient();
+
+      const { data: updatedCustomer, error: updateError } = await supabase
+        .from("customers")
+        .update({
+          account_status: accountStatus,
+        })
+        .eq("username", username)
+        .select(
+          "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_phone, auth_user_id, account_status"
+        )
+        .single();
+
+      if (updateError || !updatedCustomer) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Customer not found or update failed.",
+          },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Account ${accountStatus === 'active' ? 'enabled' : 'disabled'} successfully.`,
+        customer: toSafeCustomer({
+          id: updatedCustomer.id,
+          username: updatedCustomer.username,
+          full_name: updatedCustomer.full_name,
+          email: updatedCustomer.email,
+          company: updatedCustomer.company,
+          phone: updatedCustomer.phone,
+          date_of_birth: updatedCustomer.date_of_birth,
+          relationship_manager: updatedCustomer.relationship_manager,
+          relationship_manager_phone: updatedCustomer.relationship_manager_phone,
+          auth_user_id: updatedCustomer.auth_user_id,
+          account_status: updatedCustomer.account_status,
+        }),
+      });
+    }
+
+    // Handle customer field update
+    const body_typed = body as UpdateCustomerRequest;
+
+    const username = body_typed.username?.toString().trim();
+
+    if (!username) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Username is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Extract and validate fields
+    const fullName = body_typed.full_name?.toString().trim();
+    const email = body_typed.email?.toString().trim().toLowerCase();
+    const phone = body_typed.phone?.toString().trim() || null;
+    const company = body_typed.company?.toString().trim() || null;
+    const dateOfBirth = body_typed.date_of_birth?.toString().trim() || null;
+    const loanAmount =
+      typeof body_typed.loan_amount === "number"
+        ? body_typed.loan_amount
+        : null;
+    const product =
+      typeof body_typed.product === "string"
+        ? body_typed.product.trim() || null
+        : null;
+    const applicationStatus =
+      typeof body_typed.application_status === "string"
+        ? body_typed.application_status.trim() || null
+        : null;
+    const relationshipManager =
+      typeof body_typed.relationship_manager === "string"
+        ? body_typed.relationship_manager.trim() || null
+        : null;
+    const relationshipManagerPhone =
+      typeof body_typed.relationship_manager_phone === "string"
+        ? body_typed.relationship_manager_phone.trim() || null
+        : null;
+    const expectedApprovalDate =
+      typeof body_typed.expected_approval_date === "string"
+        ? body_typed.expected_approval_date.trim() || null
+        : null;
+    const progress =
+      typeof body_typed.progress === "number"
+        ? body_typed.progress
+        : null;
+
+    // Validate fields if provided
+    if (fullName !== undefined) {
+      if (!fullName || fullName.length === 0 || fullName.length > 255) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Full name is required (1-255 characters).",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (email !== undefined) {
+      if (!validateEmail(email)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Valid email is required.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (phone !== undefined && phone !== null && phone.length > 20) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Phone number too long (max 20 characters).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (company !== undefined && company !== null && company.length > 255) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Company name too long (max 255 characters).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (dateOfBirth !== undefined && dateOfBirth !== null && !validateDate(dateOfBirth)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid date of birth format. Use YYYY-MM-DD.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (loanAmount !== undefined && loanAmount !== null && !validateLoanAmount(loanAmount)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Loan amount must be a positive number.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (progress !== undefined && progress !== null && !validateProgress(progress)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Progress must be an integer between 0 and 100.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (relationshipManager !== undefined && relationshipManager !== null && relationshipManager.length > 255) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Relationship manager name too long (max 255 characters).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (relationshipManagerPhone !== undefined && relationshipManagerPhone !== null && relationshipManagerPhone.length > 20) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Relationship manager phone too long (max 20 characters).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (expectedApprovalDate !== undefined && expectedApprovalDate !== null && !validateDate(expectedApprovalDate)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid expected approval date format. Use YYYY-MM-DD.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createSupabaseServiceRoleClient();
+
+    // 3. Get current customer to check auth_user_id and current email
+    const { data: currentCustomer, error: selectError } = await supabase
+      .from("customers")
+      .select("id, auth_user_id, email, account_status")
+      .eq("username", username)
+      .maybeSingle();
+
+    if (selectError && selectError.code !== "PGRST116") {
+      throw selectError;
+    }
+
+    if (!currentCustomer) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Customer not found.",
+        },
+        { status: 404 }
+      );
+    }
+
+    const authUserId = currentCustomer.auth_user_id;
+    const oldEmail = currentCustomer.email;
+
+    // 4. If email is being changed, validate uniqueness and sync with Supabase Auth
+    if (email !== undefined && email !== oldEmail) {
+      // Check email uniqueness in customers table
+      const { data: existingCustomer } = await supabase
+        .from("customers")
+        .select("username")
+        .eq("email", email)
+        .neq("username", username)
+        .maybeSingle();
+
+      if (existingCustomer) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Email already in use by another customer.",
+          },
+          { status: 409 }
+        );
+      }
+
+      // Check email uniqueness in Supabase Auth
+      if (authUserId) {
+        const existingAuthUser = await findSupabaseAuthUserByEmail(email);
+        if (existingAuthUser && existingAuthUser.id !== authUserId) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Email already associated with another authentication account.",
+            },
+            { status: 409 }
+          );
+        }
+      }
+
+      // Update Supabase Auth user email FIRST
+      if (authUserId) {
+        const { error: authUpdateError } = await supabase.auth.admin.updateUserById(
+          authUserId,
+          {
+            email,
+            email_confirm: true,
+          }
+        );
+
+        if (authUpdateError) {
+          console.error("Supabase Auth email update failed:", {
+            code: authUpdateError.code ?? "UNKNOWN",
+            message: authUpdateError.message ?? "Unknown error",
+          });
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Failed to update authentication account email.",
+            },
+            { status: 500 }
+          );
+        }
+      }
+    }
+
+    // 5. Build update object with only provided fields
+    const updateData: Record<string, unknown> = {};
+
+    if (fullName !== undefined) updateData.full_name = fullName;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (company !== undefined) updateData.company = company;
+    if (dateOfBirth !== undefined) updateData.date_of_birth = dateOfBirth;
+    if (loanAmount !== undefined) updateData.loan_amount = loanAmount;
+    if (product !== undefined) updateData.product = product;
+    if (applicationStatus !== undefined) updateData.application_status = applicationStatus;
+    if (relationshipManager !== undefined) updateData.relationship_manager = relationshipManager;
+    if (relationshipManagerPhone !== undefined) updateData.relationship_manager_phone = relationshipManagerPhone;
+    if (expectedApprovalDate !== undefined) updateData.expected_approval_date = expectedApprovalDate;
+    if (progress !== undefined) updateData.progress = progress;
+
+    // 6. Update customers table
+    const { data: updatedCustomer, error: updateError } = await supabase
+      .from("customers")
+      .update(updateData)
+      .eq("username", username)
+      .select(
+        "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_phone, auth_user_id, account_status"
+      )
+      .single();
+
+    // 7. Handle rollback if email was changed but customer update failed
+    if (updateError || !updatedCustomer) {
+      console.error("Customer UPDATE failed:", updateError);
+
+      // Rollback Supabase Auth email if it was changed
+      if (email !== undefined && email !== oldEmail && authUserId) {
+        try {
+          await supabase.auth.admin.updateUserById(authUserId, {
+            email: oldEmail,
+            email_confirm: true,
+          });
+        } catch (rollbackError) {
+          console.error("Failed to rollback Auth email:", rollbackError);
+        }
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to update customer record.",
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Customer updated successfully.",
+      customer: toSafeCustomer({
+        id: updatedCustomer.id,
+        username: updatedCustomer.username,
+        full_name: updatedCustomer.full_name,
+        email: updatedCustomer.email,
+        company: updatedCustomer.company,
+        phone: updatedCustomer.phone,
+        date_of_birth: updatedCustomer.date_of_birth,
+        relationship_manager: updatedCustomer.relationship_manager,
+        relationship_manager_phone: updatedCustomer.relationship_manager_phone,
+        auth_user_id: updatedCustomer.auth_user_id,
+        account_status: updatedCustomer.account_status,
+      }),
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Customer update could not be completed.",
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -297,9 +773,11 @@ export async function POST(request: Request) {
         email: newCustomer.email,
         company: newCustomer.company,
         phone: newCustomer.phone,
+        date_of_birth: null,
         relationship_manager: newCustomer.relationship_manager,
         relationship_manager_phone: newCustomer.relationship_manager_phone,
         auth_user_id: newCustomer.auth_user_id,
+        account_status: 'active',
       }),
     });
   } catch (error) {

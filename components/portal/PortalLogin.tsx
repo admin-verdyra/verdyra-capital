@@ -2,8 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ForgotPasswordForm from "@/components/portal/ForgotPasswordForm";
 
 export default function PortalLogin() {
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  if (showForgotPassword) {
+    return (
+      <ForgotPasswordForm
+        onBackToLogin={() => setShowForgotPassword(false)}
+      />
+    );
+  }
+
+  return <PortalLoginForm setShowForgotPassword={setShowForgotPassword} />;
+}
+
+function PortalLoginForm({ setShowForgotPassword }: { setShowForgotPassword: (value: boolean) => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [captchaChecked, setCaptchaChecked] = useState(false);
@@ -69,9 +84,6 @@ export default function PortalLogin() {
       setLoading(false);
       setError("Customer authentication could not be completed.");
     }
-
-    // Next step:
-    // router.push("/portal/dashboard")
   }
 
   return (
@@ -118,7 +130,7 @@ export default function PortalLogin() {
             checked={captchaChecked}
             onChange={(e) => setCaptchaChecked(e.target.checked)}
           />
-          I&apos;m not a robot
+          I'm not a robot
         </label>
 
         {error && (
@@ -134,6 +146,16 @@ export default function PortalLogin() {
         >
           {loading ? "Signing in..." : "Login"}
         </button>
+
+        <p className="text-center text-sm text-slate-500">
+          <button
+            type="button"
+            onClick={() => setShowForgotPassword(true)}
+            className="text-[#0F5A3A] hover:underline font-medium"
+          >
+            Forgot Password?
+          </button>
+        </p>
 
       </div>
     </div>
