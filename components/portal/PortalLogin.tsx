@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { loginCustomer } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 export default function PortalLogin() {
@@ -28,21 +27,48 @@ export default function PortalLogin() {
 
     setLoading(true);
 
-    const customer = await loginCustomer(username, password);
+    try {
+      const res = await fetch("/api/portal/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    setLoading(false);
+      const data = await res.json();
 
-    if (!customer) {
+      setLoading(false);
+
+      if (!res.ok) {
+        if (res.status === 403 && data?.code === "CUSTOMER_AUTH_MIGRATION_REQUIRED") {
+          setError(
+            "Your account needs to be upgraded to secure login. Please contact Verdyra support."
+          );
+          return;
+        }
+
+        setError("Invalid username or password.");
+        return;
+      }
+
+      // Successful login: server sets HttpOnly cookies, return safe customer
+      const customer = data.customer;
+
+      if (customer) {
+        try {
+          sessionStorage.setItem("customer", JSON.stringify(customer));
+        } catch (e) {
+          // ignore sessionStorage failures
+        }
+
+        router.push("/portal/dashboard");
+        return;
+      }
+
       setError("Invalid username or password.");
-      return;
+    } catch (err) {
+      setLoading(false);
+      setError("Customer authentication could not be completed.");
     }
-
-    sessionStorage.setItem(
-  "customer",
-  JSON.stringify(customer)
-);
-
-router.push("/portal/dashboard");
 
     // Next step:
     // router.push("/portal/dashboard")
@@ -92,7 +118,7 @@ router.push("/portal/dashboard");
             checked={captchaChecked}
             onChange={(e) => setCaptchaChecked(e.target.checked)}
           />
-          I'm not a robot
+          I&apos;m not a robot
         </label>
 
         {error && (

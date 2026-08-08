@@ -12,14 +12,36 @@ export default function AuthGuard({ children }: Props) {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const customer = sessionStorage.getItem("customer");
+    let mounted = true;
 
-    if (!customer) {
-      router.replace("/portal");
-      return;
+    async function verify() {
+      try {
+        const res = await fetch("/api/portal/auth/session");
+
+        if (res.status === 200) {
+          if (mounted) setChecking(false);
+          return;
+        }
+
+        // not authenticated
+        try {
+          sessionStorage.removeItem("customer");
+        } catch (e) {}
+
+        if (mounted) {
+          router.replace("/portal");
+        }
+      } catch (err) {
+        console.error(err);
+        if (mounted) router.replace("/portal");
+      }
     }
 
-    setChecking(false);
+    verify();
+
+    return () => {
+      mounted = false;
+    };
   }, [router]);
 
   if (checking) {

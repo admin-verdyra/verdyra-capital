@@ -37,11 +37,49 @@ export function PortalProvider({
   >({});
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("customer");
+    let mounted = true;
 
-    if (saved) {
-      setCustomer(JSON.parse(saved));
+    async function fetchSession() {
+      try {
+        const res = await fetch("/api/portal/auth/session");
+
+        if (res.status === 401) {
+          try {
+            sessionStorage.removeItem("customer");
+          } catch (e) {}
+
+          if (mounted) {
+            setCustomer(null);
+            // redirect to portal login
+            window.location.href = "/portal";
+          }
+
+          return;
+        }
+
+        const data = await res.json();
+
+        if (data?.success && data.customer) {
+          if (mounted) {
+            setCustomer(data.customer);
+            try {
+              sessionStorage.setItem(
+                "customer",
+                JSON.stringify(data.customer)
+              );
+            } catch (e) {}
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
+
+    fetchSession();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
