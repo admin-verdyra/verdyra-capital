@@ -130,6 +130,12 @@ async function signInCustomerWithSupabaseAuth(
   });
 
   if (error || !data.session) {
+    // Sanitize error logging - do not log sensitive auth error details
+    const errorInfo = error as { code?: string; message?: string } | null;
+    console.error("Supabase Auth sign-in failed:", {
+      code: errorInfo?.code ?? "UNKNOWN",
+      message: errorInfo?.message ?? "Unknown error",
+    });
     throw error ?? new Error("Supabase Auth did not return a session.");
   }
 

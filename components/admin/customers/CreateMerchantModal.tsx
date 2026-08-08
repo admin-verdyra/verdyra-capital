@@ -89,6 +89,11 @@ export default function CreateMerchantModal({
 
     setLoading(true);
 
+    // Clear password from state IMMEDIATELY after sending request
+    // (before awaiting response) to minimize exposure window
+    const passwordToSend = formData.password;
+    setFormData((prev) => ({ ...prev, password: "" }));
+
     try {
       const response = await fetch(
         "/api/admin/customers",
@@ -99,7 +104,7 @@ export default function CreateMerchantModal({
           },
           body: JSON.stringify({
             username: formData.username,
-            password: formData.password,
+            password: passwordToSend,
             email: formData.email,
             full_name: formData.full_name,
             company: formData.company || null,

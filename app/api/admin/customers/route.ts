@@ -224,7 +224,12 @@ export async function POST(request: Request) {
 
       authUserId = authUser.id;
     } catch (authError) {
-      console.error("Auth user creation failed:", authError);
+      // Sanitize error logging - do not log sensitive auth error details
+      const errorInfo = authError as { code?: string; message?: string } | null;
+      console.error("Auth user creation failed:", {
+        code: errorInfo?.code ?? "UNKNOWN",
+        message: errorInfo?.message ?? "Unknown error",
+      });
       return NextResponse.json(
         {
           success: false,
@@ -235,13 +240,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Create customers row
+    // 5. Create customers row (WITHOUT password - Supabase Auth is the authority)
     const { data: newCustomer, error: insertError } =
       await supabase
         .from("customers")
         .insert({
           username,
-          password,
           full_name: fullName,
           email,
           company,

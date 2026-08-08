@@ -2,7 +2,6 @@ export type Customer = {
   auth_user_id?: string | null;
 
   username: string;
-  password: string;
 
   full_name: string;
   email: string;
