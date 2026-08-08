@@ -95,3 +95,194 @@ export async function sendPasswordResetEmail(
     return { success: false, error: errorInfo?.message ?? "Unknown error" };
   }
 }
+export async function sendWelcomeEmail(
+  to: string,
+  customerName: string,
+  username: string,
+  password: string,
+  portalUrl: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const resend = getResendClient();
+    const from = getFromEmail();
+
+    const { error } = await resend.emails.send({
+      from,
+      to,
+      subject: "Welcome to Verdyra Capital — Let’s Get You Funded 🚀",
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          </head>
+
+          <body style="margin:0;padding:0;background-color:#F6F8F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;margin:0 auto;padding:32px 16px;">
+              <tr>
+                <td>
+
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                    style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+
+                    <!-- Header -->
+                    <tr>
+                      <td style="background:#0F5A3A;padding:32px;text-align:center;">
+                        <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.12em;color:#D4AF37;text-transform:uppercase;">
+                          Verdyra Capital
+                        </p>
+
+                        <h1 style="margin:12px 0 0;font-size:28px;line-height:1.3;color:#ffffff;">
+                          Welcome Aboard! 🚀
+                        </h1>
+                      </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                      <td style="padding:36px 28px;">
+
+                        <p style="margin:0 0 18px;font-size:17px;line-height:1.6;color:#111111;">
+                          Dear ${customerName},
+                        </p>
+
+                        <p style="margin:0 0 18px;font-size:16px;line-height:1.6;color:#111111;">
+                          Welcome to <strong>Verdyra Capital!</strong> 🎉
+                        </p>
+
+                        <p style="margin:0 0 8px;font-size:21px;line-height:1.4;font-weight:700;color:#0F5A3A;">
+                          Let’s get you funded in the next 2 days 🚀
+                        </p>
+
+                        <p style="margin:0 0 28px;font-size:16px;line-height:1.6;color:#334155;">
+                          Upload your documents today, and we’ll take it forward.
+                        </p>
+
+                        <!-- Login Details -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                          style="background:#F0FDF4;border:1px solid #D4AF37;border-radius:12px;margin-bottom:28px;">
+
+                          <tr>
+                            <td style="padding:20px;">
+
+                              <p style="margin:0 0 14px;font-size:15px;font-weight:700;color:#0F5A3A;">
+                                YOUR VERDYRA CAPITAL PORTAL
+                              </p>
+
+                              <p style="margin:0 0 10px;font-size:14px;color:#475569;">
+                                <strong>Portal:</strong>
+                                <a href="${portalUrl}" target="_blank" style="color:#0F5A3A;word-break:break-all;">
+                                  ${portalUrl}
+                                </a>
+                              </p>
+
+                              <p style="margin:0 0 10px;font-size:14px;color:#475569;">
+                                <strong>Login ID:</strong> ${username}
+                              </p>
+
+                              <p style="margin:0;font-size:14px;color:#475569;">
+                                <strong>Password:</strong> ${password}
+                              </p>
+
+                            </td>
+                          </tr>
+                        </table>
+
+                        <!-- CTA -->
+                        <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 30px;">
+                          <tr>
+                            <td style="border-radius:8px;background:#0F5A3A;text-align:center;">
+                              <a
+                                href="${portalUrl}"
+                                target="_blank"
+                                style="display:inline-block;padding:15px 28px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:8px;"
+                              >
+                                ACCESS MY VERDYRA PORTAL →
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+
+                        <p style="margin:0 0 14px;font-size:16px;font-weight:700;color:#111111;">
+                          Your next step is simple
+                        </p>
+
+                        <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+                          Log in to your portal and upload the available business documents.
+                        </p>
+
+                        <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#475569;">
+                          You can also download, complete and upload the required
+                          <strong>Debt Profile</strong> and <strong>MIS</strong> templates directly from the portal.
+                        </p>
+
+                        <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+                          Once your documents are uploaded, our team will review them and take the application forward.
+                        </p>
+
+                        <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#475569;">
+                          If you need any help, simply reach out to your Relationship Manager.
+                        </p>
+
+                        <p style="margin:0;font-size:17px;font-weight:700;color:#0F5A3A;">
+                          Let’s get your business moving. 🚀
+                        </p>
+
+                      </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background:#F8FAF9;padding:24px 28px;text-align:center;border-top:1px solid #E2E8F0;">
+
+                        <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#0F5A3A;">
+                          Team Verdyra Capital
+                        </p>
+
+                        <p style="margin:0 0 10px;font-size:12px;color:#64748B;">
+                          Powering Business Growth Through Smarter Capital
+                        </p>
+
+                        <p style="margin:0;font-size:11px;color:#94A3B8;">
+                          © ${new Date().getFullYear()} Verdyra Capital. All rights reserved.
+                        </p>
+
+                      </td>
+                    </tr>
+
+                  </table>
+
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error("Welcome email send error:", {
+        message: error.message,
+      });
+
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return { success: true };
+  } catch (err) {
+    const errorInfo = err as { message?: string } | null;
+
+    console.error("sendWelcomeEmail failed:", {
+      message: errorInfo?.message ?? "Unknown error",
+    });
+
+    return {
+      success: false,
+      error: errorInfo?.message ?? "Unknown error",
+    };
+  }
+}

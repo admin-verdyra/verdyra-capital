@@ -7,6 +7,7 @@ import {
   findSupabaseAuthUserByEmail,
 } from "@/lib/server/supabaseAuth.server";
 import { createSupabaseServiceRoleClient } from "@/lib/server/supabase.server";
+import { sendWelcomeEmail } from "@/lib/server/email.server";
 
 type CreateCustomerRequest = {
   username?: unknown;
@@ -892,10 +893,51 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+    // Send welcome email after successful customer creation.
+    // Email failure must not rollback the successfully created customer.
+    const portalUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "https://verdyra-capital.vercel.app/portal";
+
+    let welcomeEmailSent = true;
+
+    try {
+      const emailResult = await sendWelcomeEmail(
+        email,
+        fullName,
+        username,
+        password,
+        portalUrl
+      );
+
+      welcomeEmailSent = emailResult.success;
+
+      if (!emailResult.success) {
+        console.error("Welcome email failed:", {
+          username,
+          email,
+          error: emailResult.error,
+        });
+      }
+    } catch (emailError) {
+      welcomeEmailSent = false;
+
+      console.error("Welcome email exception:", {
+        username,
+        email,
+        message:
+          emailError instanceof Error
+            ? emailError.message
+            : "Unknown email error",
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Merchant created successfully.",
+      message: welcomeEmailSent
+  ? "Merchant created successfully and welcome email sent."
+  : "Merchant created successfully, but the welcome email could not be sent.",
       customer: toSafeCustomer({
         id: newCustomer.id,
         username: newCustomer.username,
