@@ -51,6 +51,12 @@ export const DOCUMENTS: DocumentDefinition[] = [
     storagePrefix: "gst-certificate",
   },
   {
+    id: "msme",
+    label: "MSME Certificate",
+    description: "MSME registration certificate",
+    storagePrefix: "msme-certificate",
+  },
+  {
     id: "bank",
     label: "Bank Statements",
     description: "Latest 6 months bank statements",
@@ -61,6 +67,18 @@ export const DOCUMENTS: DocumentDefinition[] = [
     label: "Financial Statements",
     description: "P&L and Balance Sheet",
     storagePrefix: "financial-statements",
+  },
+  {
+    id: "debt_profile",
+    label: "Debt Profile",
+    description: "Debt profile spreadsheet",
+    storagePrefix: "debt-profile",
+  },
+  {
+    id: "mis",
+    label: "MIS",
+    description: "Management Information System report",
+    storagePrefix: "mis",
   },
   {
     id: "additional",

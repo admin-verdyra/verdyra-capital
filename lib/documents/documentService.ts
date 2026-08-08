@@ -15,21 +15,29 @@ export type CustomerDocument = {
 
 const BUCKET = "documents";
 
+function generateUniqueFileName(
+  documentType: string,
+  originalFileName: string
+): string {
+  const extension = originalFileName.split(".").pop();
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `${documentType}_${timestamp}_${random}.${extension}`;
+}
+
 export async function uploadDocument(
   username: string,
   documentType: string,
   file: File
 ) {
-  const extension = file.name.split(".").pop();
-
-  const fileName = `${documentType}.${extension}`;
+  const fileName = generateUniqueFileName(documentType, file.name);
 
   const storagePath = `${username}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)
     .upload(storagePath, file, {
-      upsert: true,
+      upsert: false,
     });
 
   if (uploadError) {
@@ -37,26 +45,24 @@ export async function uploadDocument(
   }
 
   const { data, error: dbError } = await supabase
-  .from("customer_documents")
-  .insert({
-    customer_username: username,
-    document_type: documentType,
-    file_name: file.name,
-    file_path: storagePath,
-    status: "Pending",
-    uploaded_at: new Date().toISOString(),
-    reviewed_at: null,
-    reviewed_by: null,
-    remarks: null,
-  })
-  .select();
+    .from("customer_documents")
+    .insert({
+      customer_username: username,
+      document_type: documentType,
+      file_name: file.name,
+      file_path: storagePath,
+      status: "Pending",
+      uploaded_at: new Date().toISOString(),
+      reviewed_at: null,
+      reviewed_by: null,
+      remarks: null,
+    })
+    .select();
 
-console.log("DB INSERT RESULT:", data);
-
-if (dbError) {
-  console.error("DB INSERT ERROR:", dbError);
-  throw dbError;
-}
+  if (dbError) {
+    console.error("DB INSERT ERROR:", dbError);
+    throw dbError;
+  }
 }
 
 export async function getCustomerDocuments(
