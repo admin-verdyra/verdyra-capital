@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Eye } from "lucide-react";
+import { Search, Eye, Plus } from "lucide-react";
 
 import type { Customer } from "@/components/portal/types";
 import { getCustomers } from "@/lib/admin/customers";
 import CustomerDetailsDrawer from "./CustomerDetailsDrawer";
+import CreateMerchantModal from "./CreateMerchantModal";
 
 export default function CustomerTable() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -20,16 +21,19 @@ export default function CustomerTable() {
   const [drawerOpen, setDrawerOpen] =
     useState(false);
 
+  const [createModalOpen, setCreateModalOpen] =
+    useState(false);
+
+  async function loadCustomers() {
+    const data = await getCustomers();
+
+    setCustomers(data);
+    setFilteredCustomers(data);
+
+    setLoading(false);
+  }
+
   useEffect(() => {
-    async function loadCustomers() {
-      const data = await getCustomers();
-
-      setCustomers(data);
-      setFilteredCustomers(data);
-
-      setLoading(false);
-    }
-
     loadCustomers();
   }, []);
 
@@ -89,21 +93,33 @@ export default function CustomerTable() {
 
           </div>
 
-          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3">
+          <div className="flex items-center gap-3">
 
-            <Search
-              size={18}
-              className="text-slate-400"
-            />
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3">
 
-            <input
-              placeholder="Search customer..."
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              className="outline-none"
-            />
+              <Search
+                size={18}
+                className="text-slate-400"
+              />
+
+              <input
+                placeholder="Search customer..."
+                value={search}
+                onChange={(e) =>
+                  setSearch(e.target.value)
+                }
+                className="outline-none"
+              />
+
+            </div>
+
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-[#0F5A3A] px-5 py-3 font-semibold text-white transition hover:scale-[1.02]"
+            >
+              <Plus size={20} />
+              Create Merchant
+            </button>
 
           </div>
 
@@ -222,6 +238,12 @@ export default function CustomerTable() {
         customer={selectedCustomer}
         open={drawerOpen}
         onClose={closeDrawer}
+      />
+
+      <CreateMerchantModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSuccess={() => loadCustomers()}
       />
     </>
   );

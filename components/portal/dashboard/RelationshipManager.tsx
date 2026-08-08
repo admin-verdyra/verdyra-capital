@@ -6,7 +6,38 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-export default function RelationshipManager() {
+import type { Customer } from "@/components/portal/types";
+
+type Props = {
+  customer: Customer;
+};
+
+export default function RelationshipManager({
+  customer,
+}: Props) {
+  const rmName = customer.relationship_manager || "Relationship Manager";
+  const rmPhone = customer.relationship_manager_phone;
+
+  const initials = rmName
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  function handleCall() {
+    if (rmPhone) {
+      window.location.href = `tel:${rmPhone}`;
+    }
+  }
+
+  function handleWhatsApp() {
+    if (rmPhone) {
+      const cleanPhone = rmPhone.replace(/\D/g, "");
+      window.location.href = `https://wa.me/${cleanPhone}`;
+    }
+  }
+
   return (
     <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
 
@@ -21,17 +52,17 @@ export default function RelationshipManager() {
       <div className="mt-8 flex items-center gap-5">
 
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#0F5A3A] to-[#1D7C55] text-3xl font-bold text-white shadow-lg">
-          AA
+          {initials}
         </div>
 
         <div>
 
           <h3 className="text-2xl font-bold">
-            Arif Asfi
+            {rmName}
           </h3>
 
           <p className="mt-1 text-slate-500">
-            Senior Funding Advisor
+            Relationship Manager
           </p>
 
           <span className="mt-3 inline-flex rounded-full bg-emerald-50 px-4 py-1 text-sm font-semibold text-emerald-700">
@@ -45,7 +76,9 @@ export default function RelationshipManager() {
       <div className="mt-8 grid gap-4">
 
         <button
-          className="flex items-center justify-center gap-3 rounded-2xl bg-[#0F5A3A] px-6 py-4 font-semibold text-white transition hover:bg-[#0C4C31]"
+          onClick={handleCall}
+          disabled={!rmPhone}
+          className="flex items-center justify-center gap-3 rounded-2xl bg-[#0F5A3A] px-6 py-4 font-semibold text-white transition hover:bg-[#0C4C31] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Phone size={20} />
 
@@ -63,7 +96,9 @@ export default function RelationshipManager() {
         </button>
 
         <button
-          className="flex items-center justify-center gap-3 rounded-2xl border border-[#25D366] bg-[#25D366]/10 px-6 py-4 font-semibold text-[#25D366] transition hover:bg-[#25D366]/20"
+          onClick={handleWhatsApp}
+          disabled={!rmPhone}
+          className="flex items-center justify-center gap-3 rounded-2xl border border-[#25D366] bg-[#25D366]/10 px-6 py-4 font-semibold text-[#25D366] transition hover:bg-[#25D366]/20 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <MessageCircle size={20} />
 

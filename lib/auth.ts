@@ -8,11 +8,14 @@ export type Customer = {
 
   full_name: string;
   email: string;
+  company: string | null;
+  phone: string | null;
 
   loan_amount: number | null;
   product: string | null;
   application_status: string | null;
   relationship_manager: string | null;
+  relationship_manager_phone: string | null;
   expected_approval_date: string | null;
   progress: number | null;
 };
@@ -28,10 +31,13 @@ export async function loginCustomer(
       password,
       full_name,
       email,
+      company,
+      phone,
       loan_amount,
       product,
       application_status,
       relationship_manager,
+      relationship_manager_phone,
       expected_approval_date,
       progress
     `)

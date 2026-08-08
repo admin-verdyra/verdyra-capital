@@ -32,7 +32,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <RelationshipManager />
+        <RelationshipManager customer={customer} />
         <QuickActions />
       </div>
 

@@ -6,11 +6,14 @@ export type Customer = {
 
   full_name: string;
   email: string;
+  company: string | null;
+  phone: string | null;
 
   loan_amount: number | null;
   product: string | null;
   application_status: string | null;
   relationship_manager: string | null;
+  relationship_manager_phone: string | null;
   expected_approval_date: string | null;
   progress: number | null;
 };
