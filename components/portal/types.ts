@@ -14,6 +14,7 @@ export type Customer = {
   application_status: string | null;
   account_status: 'active' | 'disabled';
   relationship_manager: string | null;
+  relationship_manager_email: string | null;
   relationship_manager_phone: string | null;
   expected_approval_date: string | null;
   progress: number | null;

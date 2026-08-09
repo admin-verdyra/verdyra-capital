@@ -34,6 +34,7 @@ type CustomerRecord = {
   application_status: string | null;
   account_status: 'active' | 'disabled';
   relationship_manager: string | null;
+  relationship_manager_email: string | null;
   relationship_manager_phone: string | null;
   expected_approval_date: string | null;
   progress: number | null;
@@ -52,6 +53,7 @@ export type SafeCustomer = {
   product: string | null;
   application_status: string | null;
   relationship_manager: string | null;
+  relationship_manager_email: string | null;
   relationship_manager_phone: string | null;
   expected_approval_date: string | null;
   progress: number | null;
@@ -70,6 +72,7 @@ function toSafeCustomer(customer: CustomerRecord): SafeCustomer {
     product: customer.product,
     application_status: customer.application_status,
     relationship_manager: customer.relationship_manager,
+    relationship_manager_email: customer.relationship_manager_email,
     relationship_manager_phone: customer.relationship_manager_phone,
     expected_approval_date: customer.expected_approval_date,
     progress: customer.progress,
@@ -84,7 +87,7 @@ export async function getCustomerByUsername(
   const { data, error } = await supabase
     .from("customers")
     .select(
-      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
+      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_email, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
     )
     .eq("username", username.trim())
     .maybeSingle<CustomerRecord>();
@@ -104,7 +107,7 @@ export async function getCustomerByAuthUserId(
   const { data, error } = await supabase
     .from("customers")
     .select(
-      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
+      `id, username, password, full_name, email, phone, company, created_at, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_email, relationship_manager_phone, expected_approval_date, progress, auth_user_id`
     )
     .eq("auth_user_id", authUserId)
     .maybeSingle<CustomerRecord>();

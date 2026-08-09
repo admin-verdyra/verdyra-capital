@@ -20,6 +20,7 @@ type FormData = {
   product: string;
   application_status: string;
   relationship_manager: string;
+  relationship_manager_email: string;
   relationship_manager_phone: string;
   expected_approval_date: string;
   progress: string;
@@ -41,6 +42,7 @@ export default function CreateMerchantModal({
     product: "",
     application_status: "",
     relationship_manager: "",
+    relationship_manager_email: "",
     relationship_manager_phone: "",
     expected_approval_date: "",
     progress: "",
@@ -117,6 +119,8 @@ export default function CreateMerchantModal({
               formData.application_status || null,
             relationship_manager:
               formData.relationship_manager || null,
+            relationship_manager_email:
+              formData.relationship_manager_email || null,
             relationship_manager_phone:
               formData.relationship_manager_phone || null,
             expected_approval_date:
@@ -155,6 +159,7 @@ export default function CreateMerchantModal({
           product: "",
           application_status: "",
           relationship_manager: "",
+          relationship_manager_email: "",
           relationship_manager_phone: "",
           expected_approval_date: "",
           progress: "",
@@ -351,6 +356,16 @@ export default function CreateMerchantModal({
                 name="relationship_manager"
                 placeholder="Relationship Manager"
                 value={formData.relationship_manager}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="rounded-xl border border-slate-200 px-4 py-3 disabled:opacity-50"
+              />
+
+              <input
+                type="email"
+                name="relationship_manager_email"
+                placeholder="RM Email"
+                value={formData.relationship_manager_email}
                 onChange={handleInputChange}
                 disabled={loading}
                 className="rounded-xl border border-slate-200 px-4 py-3 disabled:opacity-50"

@@ -16,6 +16,7 @@ export default function RelationshipManager({
   customer,
 }: Props) {
   const rmName = customer.relationship_manager || "Relationship Manager";
+  const rmEmail = customer.relationship_manager_email;
   const rmPhone = customer.relationship_manager_phone;
 
   const initials = rmName
@@ -28,6 +29,12 @@ export default function RelationshipManager({
   function handleCall() {
     if (rmPhone) {
       window.location.href = `tel:${rmPhone}`;
+    }
+  }
+
+  function handleEmail() {
+    if (rmEmail) {
+      window.location.href = `mailto:${rmEmail}`;
     }
   }
 
@@ -65,6 +72,12 @@ export default function RelationshipManager({
             Relationship Manager
           </p>
 
+          {rmEmail && (
+            <p className="mt-1 text-sm text-slate-500">
+              {rmEmail}
+            </p>
+          )}
+
           <span className="mt-3 inline-flex rounded-full bg-emerald-50 px-4 py-1 text-sm font-semibold text-emerald-700">
             Available
           </span>
@@ -87,7 +100,9 @@ export default function RelationshipManager({
         </button>
 
         <button
-          className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 px-6 py-4 font-semibold transition hover:bg-slate-50"
+          onClick={handleEmail}
+          disabled={!rmEmail}
+          className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 px-6 py-4 font-semibold transition hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Mail size={20} />
 

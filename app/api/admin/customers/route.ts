@@ -20,6 +20,7 @@ type CreateCustomerRequest = {
   product?: unknown;
   application_status?: unknown;
   relationship_manager?: unknown;
+  relationship_manager_email?: unknown;
   relationship_manager_phone?: unknown;
   expected_approval_date?: unknown;
   progress?: unknown;
@@ -36,6 +37,7 @@ type UpdateCustomerRequest = {
   product?: unknown;
   application_status?: unknown;
   relationship_manager?: unknown;
+  relationship_manager_email?: unknown;
   relationship_manager_phone?: unknown;
   expected_approval_date?: unknown;
   progress?: unknown;
@@ -55,6 +57,7 @@ type SafeCustomer = {
   phone: string | null;
   date_of_birth: string | null;
   relationship_manager: string | null;
+  relationship_manager_email: string | null;
   relationship_manager_phone: string | null;
   auth_user_id: string;
   account_status: 'active' | 'disabled';
@@ -125,6 +128,7 @@ function toSafeCustomer(data: {
   phone: string | null;
   date_of_birth: string | null;
   relationship_manager: string | null;
+  relationship_manager_email: string | null;
   relationship_manager_phone: string | null;
   auth_user_id: string;
   account_status: 'active' | 'disabled';
@@ -138,6 +142,7 @@ function toSafeCustomer(data: {
     phone: data.phone,
     date_of_birth: data.date_of_birth,
     relationship_manager: data.relationship_manager,
+    relationship_manager_email: data.relationship_manager_email,
     relationship_manager_phone: data.relationship_manager_phone,
     auth_user_id: data.auth_user_id,
     account_status: data.account_status,
@@ -209,7 +214,7 @@ export async function PATCH(request: Request) {
         })
         .eq("username", username)
         .select(
-          "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_phone, auth_user_id, account_status"
+          "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status"
         )
         .single();
 
@@ -235,6 +240,7 @@ export async function PATCH(request: Request) {
           phone: updatedCustomer.phone,
           date_of_birth: updatedCustomer.date_of_birth,
           relationship_manager: updatedCustomer.relationship_manager,
+          relationship_manager_email: updatedCustomer.relationship_manager_email,
           relationship_manager_phone: updatedCustomer.relationship_manager_phone,
           auth_user_id: updatedCustomer.auth_user_id,
           account_status: updatedCustomer.account_status,
@@ -278,6 +284,10 @@ export async function PATCH(request: Request) {
     const relationshipManager =
       typeof body_typed.relationship_manager === "string"
         ? body_typed.relationship_manager.trim() || null
+        : null;
+    const relationshipManagerEmail =
+      typeof body_typed.relationship_manager_email === "string"
+        ? body_typed.relationship_manager_email.trim() || null
         : null;
     const relationshipManagerPhone =
       typeof body_typed.relationship_manager_phone === "string"
@@ -382,6 +392,26 @@ export async function PATCH(request: Request) {
         {
           success: false,
           message: "Relationship manager phone too long (max 20 characters).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (relationshipManagerEmail !== undefined && relationshipManagerEmail !== null && relationshipManagerEmail.length > 255) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Relationship manager email too long (max 255 characters).",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (relationshipManagerEmail !== undefined && relationshipManagerEmail !== null && !validateEmail(relationshipManagerEmail)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Valid relationship manager email is required.",
         },
         { status: 400 }
       );
@@ -495,6 +525,7 @@ export async function PATCH(request: Request) {
     if (product !== undefined) updateData.product = product;
     if (applicationStatus !== undefined) updateData.application_status = applicationStatus;
     if (relationshipManager !== undefined) updateData.relationship_manager = relationshipManager;
+    if (relationshipManagerEmail !== undefined) updateData.relationship_manager_email = relationshipManagerEmail;
     if (relationshipManagerPhone !== undefined) updateData.relationship_manager_phone = relationshipManagerPhone;
     if (expectedApprovalDate !== undefined) updateData.expected_approval_date = expectedApprovalDate;
     if (progress !== undefined) updateData.progress = progress;
@@ -505,7 +536,7 @@ export async function PATCH(request: Request) {
       .update(updateData)
       .eq("username", username)
       .select(
-        "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_phone, auth_user_id, account_status"
+        "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status"
       )
       .single();
 
@@ -546,6 +577,7 @@ export async function PATCH(request: Request) {
         phone: updatedCustomer.phone,
         date_of_birth: updatedCustomer.date_of_birth,
         relationship_manager: updatedCustomer.relationship_manager,
+        relationship_manager_email: updatedCustomer.relationship_manager_email,
         relationship_manager_phone: updatedCustomer.relationship_manager_phone,
         auth_user_id: updatedCustomer.auth_user_id,
         account_status: updatedCustomer.account_status,
@@ -779,6 +811,10 @@ export async function POST(request: Request) {
       typeof body_typed.relationship_manager === "string"
         ? body_typed.relationship_manager.trim() || null
         : null;
+    const relationshipManagerEmail =
+      typeof body_typed.relationship_manager_email === "string"
+        ? body_typed.relationship_manager_email.trim() || null
+        : null;
     const relationshipManagerPhone =
       typeof body_typed.relationship_manager_phone === "string"
         ? body_typed.relationship_manager_phone.trim() || null
@@ -861,13 +897,14 @@ export async function POST(request: Request) {
           product: product,
           application_status: applicationStatus,
           relationship_manager: relationshipManager,
+          relationship_manager_email: relationshipManagerEmail,
           relationship_manager_phone: relationshipManagerPhone,
           expected_approval_date: expectedApprovalDate,
           progress: progress,
           auth_user_id: authUserId,
         })
         .select(
-          "id, username, full_name, email, company, phone, relationship_manager, relationship_manager_phone, auth_user_id"
+          "id, username, full_name, email, company, phone, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id"
         )
         .single();
 
@@ -947,6 +984,7 @@ export async function POST(request: Request) {
         phone: newCustomer.phone,
         date_of_birth: null,
         relationship_manager: newCustomer.relationship_manager,
+        relationship_manager_email: newCustomer.relationship_manager_email,
         relationship_manager_phone: newCustomer.relationship_manager_phone,
         auth_user_id: newCustomer.auth_user_id,
         account_status: 'active',
