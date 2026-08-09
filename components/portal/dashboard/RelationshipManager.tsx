@@ -46,25 +46,25 @@ export default function RelationshipManager({
   }
 
   return (
-    <section id="relationship-manager" className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
+    <section id="relationship-manager" className="rounded-[30px] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
 
       <p className="text-sm font-medium uppercase tracking-[0.25em] text-slate-400">
         Dedicated Support
       </p>
 
-      <h2 className="mt-2 text-2xl font-bold text-slate-900">
+      <h2 className="mt-2 text-xl md:text-2xl font-bold text-slate-900">
         Relationship Manager
       </h2>
 
       <div className="mt-8 flex items-center gap-5">
 
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#0F5A3A] to-[#1D7C55] text-3xl font-bold text-white shadow-lg">
+        <div className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#0F5A3A] to-[#1D7C55] text-2xl md:text-3xl font-bold text-white shadow-lg">
           {initials}
         </div>
 
-        <div>
+        <div className="min-w-0">
 
-          <h3 className="text-2xl font-bold">
+          <h3 className="text-xl md:text-2xl font-bold truncate">
             {rmName}
           </h3>
 
@@ -73,20 +73,32 @@ export default function RelationshipManager({
           </p>
 
           {rmEmail && (
-            <p className="mt-1 text-sm text-slate-500">
+            <a
+              href={`mailto:${rmEmail}`}
+              className="mt-1 text-sm text-slate-500 hover:text-slate-700 underline underline-offset-2 transition-colors"
+            >
               {rmEmail}
-            </p>
+            </a>
+          )}
+
+          {rmPhone && (
+            <a
+              href={`tel:${rmPhone}`}
+              className="mt-1 text-sm text-slate-500 hover:text-slate-700 underline underline-offset-2 transition-colors"
+            >
+              {rmPhone}
+            </a>
           )}
 
           <span className="mt-3 inline-flex rounded-full bg-emerald-50 px-4 py-1 text-sm font-semibold text-emerald-700">
-            Available
+            Contact your Relationship Manager
           </span>
 
         </div>
 
       </div>
 
-      <div className="mt-8 grid gap-4">
+      <div className="mt-8 grid gap-4 md:grid-cols-3">
 
         <button
           onClick={handleCall}

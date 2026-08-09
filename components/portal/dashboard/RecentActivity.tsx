@@ -156,13 +156,13 @@ export default function RecentActivity() {
   }
 
   return (
-    <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
+    <section className="rounded-[30px] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
 
       <p className="text-sm font-medium uppercase tracking-[0.25em] text-slate-400">
         Updates
       </p>
 
-      <h2 className="mt-2 text-2xl font-bold">
+      <h2 className="mt-2 text-xl md:text-2xl font-bold">
         Recent Activity
       </h2>
 
@@ -172,6 +172,41 @@ export default function RecentActivity() {
           const Icon = getDocumentIcon(doc.document_type);
           const color = getDocumentColor(doc.document_type);
           const displayName = doc.document_type.charAt(0).toUpperCase() + doc.document_type.slice(1);
+
+          // Determine activity title and status badge based on doc.status
+          const status = (doc.status ?? "").toLowerCase();
+          let activityTitle = `${displayName} Uploaded`;
+          let statusBadge = null;
+
+          if (status === "approved") {
+            activityTitle = `${displayName} Approved`;
+            statusBadge = (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                Approved
+              </span>
+            );
+          } else if (status === "rejected") {
+            activityTitle = `${displayName} Rejected`;
+            statusBadge = (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
+                Rejected
+              </span>
+            );
+          } else if (status === "pending") {
+            activityTitle = `${displayName} Uploaded`;
+            statusBadge = (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
+                Pending
+              </span>
+            );
+          } else if (status === "re-upload required" || status === "reupload required") {
+            activityTitle = `${displayName} Requires Re-upload`;
+            statusBadge = (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700">
+                Re-upload Required
+              </span>
+            );
+          }
 
           return (
             <div
@@ -185,11 +220,20 @@ export default function RecentActivity() {
                 <Icon size={22} />
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
 
-                <h3 className="font-semibold text-slate-900">
-                  {displayName} Uploaded
-                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold text-slate-900">
+                    {activityTitle}
+                  </h3>
+                  {statusBadge}
+                </div>
+
+                {doc.file_name && (
+                  <p className="mt-1 text-sm text-slate-500 truncate">
+                    {doc.file_name}
+                  </p>
+                )}
 
                 <p className="mt-1 text-sm text-slate-500">
                   {formatTimestamp(doc.uploaded_at)}

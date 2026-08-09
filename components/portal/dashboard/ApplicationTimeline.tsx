@@ -41,7 +41,7 @@ const steps = [
 
 export default function ApplicationTimeline() {
   return (
-    <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
+    <section className="rounded-[30px] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
 
       <div className="flex items-center justify-between">
 
@@ -51,7 +51,7 @@ export default function ApplicationTimeline() {
             Journey
           </p>
 
-          <h2 className="mt-2 text-2xl font-bold">
+          <h2 className="mt-2 text-xl md:text-2xl font-bold">
             Application Timeline
           </h2>
 
@@ -59,7 +59,7 @@ export default function ApplicationTimeline() {
 
       </div>
 
-      <div className="mt-10">
+      <div className="mt-8 md:mt-10">
 
         {steps.map((step, index) => {
 
@@ -76,9 +76,10 @@ export default function ApplicationTimeline() {
               {/* Line */}
 
               {index !== steps.length - 1 && (
-
-                <div className="absolute left-5 top-10 h-full w-[2px] bg-slate-200" />
-
+                <>
+                  {/* Line from bottom of current icon to top of next icon */}
+                  <div className="absolute left-5 top-10 h-[calc(100%-20px)] w-[2px] bg-slate-200" />
+                </>
               )}
 
               {/* Icon */}
@@ -88,13 +89,13 @@ export default function ApplicationTimeline() {
                   completed
                     ? "bg-emerald-500 text-white"
                     : active
-                    ? "bg-amber-500 text-white"
+                    ? "bg-amber-500 text-white ring-4 ring-amber-500/20"
                     : "bg-slate-200 text-slate-500"
                 }`}
               >
 
                 {completed ? (
-                  <CheckCircle2 size={20} />
+                  <CheckCircle2 size={18} />
                 ) : active ? (
                   <Clock3 size={18} />
                 ) : (
@@ -105,15 +106,15 @@ export default function ApplicationTimeline() {
 
               {/* Content */}
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
 
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className={`font-semibold text-slate-900 ${active ? "text-lg" : ""}`}>
                     {step.title}
                   </h3>
 
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-slate-500 shrink-0">
                     {step.date}
                   </span>
 

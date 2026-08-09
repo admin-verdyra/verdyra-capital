@@ -18,7 +18,7 @@ export default function DashboardPage() {
   if (!customer) return null;
 
   return (
-    <div className="space-y-8">
+    <div className="w-full space-y-8">
       <DashboardHero customer={customer} />
 
       <QuickActions />
