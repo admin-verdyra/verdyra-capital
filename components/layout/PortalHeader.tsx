@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Menu, Search, LogOut, User } from "lucide-react";
+import { Menu, Search, LogOut, User } from "lucide-react";
 
 type PortalHeaderProps = {
   customerName?: string;
@@ -117,14 +117,6 @@ export default function PortalHeader({
 
           <button className="rounded-xl p-3 transition hover:bg-slate-100">
             <Search size={20} />
-          </button>
-
-          <button className="relative rounded-xl p-3 transition hover:bg-slate-100">
-
-            <Bell size={20} />
-
-            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500" />
-
           </button>
 
           {/* Account Menu */}

@@ -40,13 +40,6 @@ const actions = [
     color: "bg-amber-50 text-amber-700",
   },
   {
-    title: "Need Help?",
-    description: "Frequently asked questions",
-    href: "/portal/notifications",
-    icon: CircleHelp,
-    color: "bg-slate-100 text-slate-700",
-  },
-  {
     title: "Contact Support",
     description: "Speak with Verdyra",
     href: "/portal/profile",

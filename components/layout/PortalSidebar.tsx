@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   FolderOpen,
-  Bell,
   User,
   LogOut,
   ChevronRight,
@@ -21,11 +20,6 @@ const navItems = [
     title: "Documents",
     href: "/portal/documents",
     icon: FolderOpen,
-  },
-  {
-    title: "Notifications",
-    href: "/portal/notifications",
-    icon: Bell,
   },
   {
     title: "Profile",
