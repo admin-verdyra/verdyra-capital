@@ -1,42 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  Users,
-  IndianRupee,
-  BadgeCheck,
-  Clock3,
-} from "lucide-react";
+import { Users, IndianRupee, BadgeCheck, Clock3 } from "lucide-react";
 
-import {
-  getDashboardStats,
-  type DashboardStats,
-} from "@/lib/admin/dashboard";
+import { type DashboardStats } from "@/lib/admin/dashboard";
 
-export default function AdminStats() {
-  const [stats, setStats] =
-    useState<DashboardStats | null>(null);
+interface AdminStatsProps {
+  data: DashboardStats;
+}
 
-  useEffect(() => {
-    async function load() {
-      setStats(await getDashboardStats());
-    }
-
-    load();
-  }, []);
-
-  if (!stats) {
-    return (
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-40 animate-pulse rounded-[28px] bg-slate-100"
-          />
-        ))}
-      </div>
-    );
-  }
+export default function AdminStats({ data }: AdminStatsProps) {
+  const stats = data;
 
   const cards = [
     {
@@ -47,9 +20,7 @@ export default function AdminStats() {
     },
     {
       title: "Loan Amount",
-      value:
-        "₹" +
-        stats.totalLoanAmount.toLocaleString("en-IN"),
+      value: "₹" + stats.totalLoanAmount.toLocaleString("en-IN"),
       icon: IndianRupee,
       color: "bg-emerald-50 text-emerald-700",
     },
