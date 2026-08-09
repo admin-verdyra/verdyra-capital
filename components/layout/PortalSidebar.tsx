@@ -65,18 +65,18 @@ export default function PortalSidebar() {
 
       {/* Logo */}
 
-      <Link
-  href="/portal"
+      <a
+  href="https://www.verdyracapital.in/"
   className="block border-b border-white/10 px-8 py-8 transition hover:bg-white/5"
+  target="_self"
+  rel="noopener noreferrer"
 >
-  <h1 className="text-3xl font-bold tracking-tight">
-    Verdyra
-  </h1>
-
-  <p className="mt-2 text-sm text-white/70">
-    Customer Portal
-  </p>
-</Link>
+  <img
+    src="/images/logo/logo-horizontal.png"
+    alt="Verdyra Capital"
+    className="h-10 w-auto"
+  />
+</a>
 
       {/* Navigation */}
 

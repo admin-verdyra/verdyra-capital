@@ -1,6 +1,8 @@
 "use client";
 
-import { Bell, Menu, Search } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Bell, Menu, Search, LogOut, User } from "lucide-react";
 
 type PortalHeaderProps = {
   customerName?: string;
@@ -11,7 +13,10 @@ export default function PortalHeader({
   customerName = "Customer",
   onMenuClick,
 }: PortalHeaderProps) {
+  const router = useRouter();
   const hour = new Date().getHours();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const greeting =
     hour < 12
@@ -26,6 +31,55 @@ export default function PortalHeader({
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/portal/auth/logout", {
+        method: "POST",
+      });
+
+      // Clear cached customer in sessionStorage regardless
+      try {
+        sessionStorage.removeItem("customer");
+      } catch {}
+
+      // Navigate to portal login
+      router.push("/portal");
+    } catch (err) {
+      console.error("Logout failed", err);
+      try {
+        sessionStorage.removeItem("customer");
+      } catch {}
+      router.push("/portal");
+    }
+  }
+
+  function handleProfileClick() {
+    router.push("/portal/profile");
+    setIsMenuOpen(false);
+  }
+
+  function handleLogoutClick() {
+    setIsMenuOpen(false);
+    handleLogout();
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
@@ -73,10 +127,38 @@ export default function PortalHeader({
 
           </button>
 
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0F5A3A] font-semibold text-white shadow">
+          {/* Account Menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0F5A3A] font-semibold text-white shadow transition hover:opacity-90"
+              aria-expanded={isMenuOpen}
+              aria-haspopup="true"
+            >
+              {initials}
+            </button>
 
-            {initials}
-
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-40 origin-top-right animate-in fade-in-0 zoom-in-95 transition-all duration-150">
+                <div className="rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden">
+                  <button
+                    onClick={handleProfileClick}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  >
+                    <User size={16} className="text-slate-400" />
+                    Profile
+                  </button>
+                  <div className="border-t border-slate-100" />
+                  <button
+                    onClick={handleLogoutClick}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  >
+                    <LogOut size={16} />
+                    Log Out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
