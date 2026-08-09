@@ -14,16 +14,8 @@ export default function PortalHeader({
   onMenuClick,
 }: PortalHeaderProps) {
   const router = useRouter();
-  const hour = new Date().getHours();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const greeting =
-    hour < 12
-      ? "Good Morning"
-      : hour < 17
-      ? "Good Afternoon"
-      : "Good Evening";
 
   const initials = customerName
     .split(" ")
@@ -97,14 +89,10 @@ export default function PortalHeader({
             <Menu size={22} />
           </button>
 
-          <div>
-
-            <p className="text-sm text-slate-500">
-              {greeting}
-            </p>
+          <div className="hidden lg:block">
 
             <h1 className="text-2xl font-bold text-slate-900">
-              {customerName} 👋
+              {customerName}
             </h1>
 
           </div>

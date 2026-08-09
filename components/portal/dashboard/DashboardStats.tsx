@@ -40,17 +40,10 @@ export default function DashboardStats({
       icon: CircleCheckBig,
       color: "bg-amber-50 text-amber-700",
     },
-    {
-      title: "Relationship Manager",
-      value: customer.relationship_manager ?? "N/A",
-      subtitle: "Dedicated Advisor",
-      icon: UserRound,
-      color: "bg-purple-50 text-purple-700",
-    },
   ];
 
   return (
-    <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
       {stats.map((item) => {
         const Icon = item.icon;
 
