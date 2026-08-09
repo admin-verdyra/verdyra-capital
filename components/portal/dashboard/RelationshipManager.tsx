@@ -46,7 +46,7 @@ export default function RelationshipManager({
   }
 
   return (
-    <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
+    <section id="relationship-manager" className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
 
       <p className="text-sm font-medium uppercase tracking-[0.25em] text-slate-400">
         Dedicated Support

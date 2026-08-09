@@ -2,49 +2,25 @@
 
 import Link from "next/link";
 import {
-  Upload,
   Calculator,
   PhoneCall,
-  CircleHelp,
-  FileText,
-  CalendarDays,
+  ChevronRight,
 } from "lucide-react";
 
 const actions = [
   {
-    title: "Upload Documents",
-    description: "Submit pending KYC documents",
-    href: "/portal/documents",
-    icon: Upload,
-    color: "bg-emerald-50 text-emerald-700",
-  },
-  {
     title: "EMI Calculator",
-    description: "Estimate your monthly EMI",
-    href: "/#calculator",
+    description: "Estimate your monthly repayment",
+    href: "/portal/emi-calculator",
     icon: Calculator,
     color: "bg-blue-50 text-blue-700",
   },
   {
-    title: "Schedule a Call",
-    description: "Book time with your RM",
-    href: "/portal/profile",
-    icon: CalendarDays,
-    color: "bg-purple-50 text-purple-700",
-  },
-  {
-    title: "Download Documents",
-    description: "Sanction letters & statements",
-    href: "/portal/documents",
-    icon: FileText,
-    color: "bg-amber-50 text-amber-700",
-  },
-  {
-    title: "Contact Support",
-    description: "Speak with Verdyra",
-    href: "/portal/profile",
+    title: "Contact Relationship Manager",
+    description: "Connect directly with your Relationship Manager",
+    href: "/portal/dashboard#relationship-manager",
     icon: PhoneCall,
-    color: "bg-red-50 text-red-700",
+    color: "bg-purple-50 text-purple-700",
   },
 ];
 
@@ -60,7 +36,7 @@ export default function QuickActions() {
         Quick Actions
       </h2>
 
-      <div className="mt-8 grid gap-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
 
         {actions.map((action) => {
           const Icon = action.icon;
@@ -69,24 +45,32 @@ export default function QuickActions() {
             <Link
               key={action.title}
               href={action.href}
-              className="group flex items-center gap-4 rounded-2xl border border-slate-200 p-4 transition-all duration-300 hover:border-[#0F5A3A] hover:shadow-md"
+              className="group flex items-center gap-4 rounded-2xl border border-slate-200 p-4 transition-all duration-300 hover:border-slate-300 hover:shadow-lg"
             >
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${action.color}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.color} shrink-0`}
               >
                 <Icon size={22} />
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
 
-                <h3 className="font-semibold text-slate-900 group-hover:text-[#0F5A3A]">
+                <h3 className="font-semibold text-slate-900 group-hover:text-[#0F5A3A] transition-colors duration-200">
                   {action.title}
                 </h3>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-0.5 text-sm text-slate-500 leading-snug">
                   {action.description}
                 </p>
 
+              </div>
+
+              <div className="flex items-center justify-center shrink-0">
+                <ChevronRight
+                  size={20}
+                  className="text-slate-300 group-hover:text-slate-500 transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </div>
 
             </Link>
