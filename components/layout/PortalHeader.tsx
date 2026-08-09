@@ -7,11 +7,13 @@ import { Menu, Search, LogOut, User } from "lucide-react";
 type PortalHeaderProps = {
   customerName?: string;
   onMenuClick?: () => void;
+  isMobileMenuOpen?: boolean;
 };
 
 export default function PortalHeader({
   customerName = "Customer",
   onMenuClick,
+  isMobileMenuOpen = false,
 }: PortalHeaderProps) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -85,6 +87,9 @@ export default function PortalHeader({
           <button
             onClick={onMenuClick}
             className="rounded-xl p-2 transition hover:bg-slate-100 lg:hidden"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation-drawer"
+            aria-label="Open navigation menu"
           >
             <Menu size={22} />
           </button>
