@@ -5,11 +5,8 @@ import CustomerTable from "@/components/admin/customers/CustomerTable";
 export default function CustomersPage() {
   return (
     <AdminProtectedRoute>
-      <AdminShell
-        title="Customers"
-        subtitle="Manage all Verdyra customers"
-      >
-        <CustomerTable />
+      <AdminShell title="Customers" subtitle="Manage all Verdyra customers">
+        <CustomerTable selectedStatus={null} />
       </AdminShell>
     </AdminProtectedRoute>
   );

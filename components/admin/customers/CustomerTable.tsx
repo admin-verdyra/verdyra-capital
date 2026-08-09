@@ -9,7 +9,11 @@ import { isValidStatus, APPLICATION_STATUSES, type ApplicationStatus } from "@/l
 import CustomerDetailsDrawer from "./CustomerDetailsDrawer";
 import CreateMerchantModal from "./CreateMerchantModal";
 
-export default function CustomerTable() {
+interface CustomerTableProps {
+  selectedStatus: string | null;
+}
+
+export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
@@ -43,25 +47,33 @@ export default function CustomerTable() {
     loadCustomers();
   }, []);
 
+  // Filter by application status from URL
   useEffect(() => {
-    const value = search.toLowerCase();
+    let filtered = customers;
 
-    setFilteredCustomers(
-      customers.filter((customer) => {
-        return (
-          customer.full_name
-            .toLowerCase()
-            .includes(value) ||
-          customer.email
-            .toLowerCase()
-            .includes(value) ||
-          customer.username
-            .toLowerCase()
-            .includes(value)
-        );
-      })
-    );
-  }, [customers, search]);
+    if (selectedStatus) {
+      if (selectedStatus === "Not Set") {
+        filtered = customers.filter((customer) => {
+          const status = customer.application_status;
+          return !status || !isValidStatus(status);
+        });
+      } else {
+        filtered = customers.filter((customer) => customer.application_status === selectedStatus);
+      }
+    }
+
+    // Then apply search filter
+    const value = search.toLowerCase();
+    filtered = filtered.filter((customer) => {
+      return (
+        customer.full_name.toLowerCase().includes(value) ||
+        customer.email.toLowerCase().includes(value) ||
+        customer.username.toLowerCase().includes(value)
+      );
+    });
+
+    setFilteredCustomers(filtered);
+  }, [customers, search, selectedStatus]);
 
   function openCustomer(customer: Customer) {
     setSelectedCustomer(customer);
@@ -120,39 +132,33 @@ export default function CustomerTable() {
   return (
     <>
       <section className="rounded-[30px] border border-slate-200 bg-white shadow-sm">
-
         <div className="flex items-center justify-between border-b p-6">
-
           <div>
+            <h2 className="text-2xl font-bold">Customers</h2>
 
-            <h2 className="text-2xl font-bold">
-              Customers
-            </h2>
+            {selectedStatus && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+                <span className="font-medium text-slate-900">Showing:</span>
+                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">
+                  {selectedStatus}
+                </span>
+              </div>
+            )}
 
             <p className="mt-1 text-slate-500">
               {filteredCustomers.length} customer(s)
             </p>
-
           </div>
 
           <div className="flex items-center gap-3">
-
             <div className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3">
-
-              <Search
-                size={18}
-                className="text-slate-400"
-              />
-
+              <Search size={18} className="text-slate-400" />
               <input
                 placeholder="Search customer..."
                 value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
+                onChange={(e) => setSearch(e.target.value)}
                 className="outline-none"
               />
-
             </div>
 
             <button
@@ -162,87 +168,41 @@ export default function CustomerTable() {
               <Plus size={20} />
               Create Merchant
             </button>
-
           </div>
-
         </div>
 
         <table className="w-full">
-
           <thead className="bg-slate-50">
-
             <tr>
-
-              <th className="px-6 py-4 text-left">
-                Customer
-              </th>
-
-              <th className="px-6 py-4 text-left">
-                Product
-              </th>
-
-              <th className="px-6 py-4 text-left">
-                Loan Amount
-              </th>
-
-              <th className="px-6 py-4 text-left">
-                Application Status
-              </th>
-
-              <th className="px-6 py-4 text-left">
-                Account Status
-              </th>
-
-              <th className="px-6 py-4 text-left">
-                RM
-              </th>
-
-              <th className="px-6 py-4 text-center">
-                View
-              </th>
-
+              <th className="px-6 py-4 text-left">Customer</th>
+              <th className="px-6 py-4 text-left">Product</th>
+              <th className="px-6 py-4 text-left">Loan Amount</th>
+              <th className="px-6 py-4 text-left">Application Status</th>
+              <th className="px-6 py-4 text-left">Account Status</th>
+              <th className="px-6 py-4 text-left">RM</th>
+              <th className="px-6 py-4 text-center">View</th>
             </tr>
-
           </thead>
 
           <tbody>
-
             {filteredCustomers.map((customer) => {
               const isUpdating = updatingStatus === customer.username;
               const showError = statusError && updatingStatus === customer.username;
               const showSuccess = statusSuccess === customer.username;
 
               return (
-                <tr
-                  key={customer.username}
-                  className="border-t transition hover:bg-slate-50"
-                >
-
+                <tr key={customer.username} className="border-t transition hover:bg-slate-50">
                   <td className="px-6 py-5">
-
                     <div>
-
-                      <h3 className="font-semibold">
-                        {customer.full_name}
-                      </h3>
-
-                      <p className="text-sm text-slate-500">
-                        {customer.email}
-                      </p>
-
+                      <h3 className="font-semibold">{customer.full_name}</h3>
+                      <p className="text-sm text-slate-500">{customer.email}</p>
                     </div>
-
                   </td>
 
-                  <td className="px-6 py-5">
-                    {customer.product}
-                  </td>
+                  <td className="px-6 py-5">{customer.product}</td>
 
                   <td className="px-6 py-5">
-                    ₹
-                    {Number(
-                      customer.loan_amount ?? 0
-                    ).toLocaleString("en-IN")}
+                    ₹{Number(customer.loan_amount ?? 0).toLocaleString("en-IN")}
                   </td>
 
                   <td className="px-6 py-5">
@@ -284,55 +244,35 @@ export default function CustomerTable() {
                     <span
                       className={
                         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium " +
-                        (customer.account_status === 'active'
+                        (customer.account_status === "active"
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800")
                       }
                     >
-                      {customer.account_status === 'active' ? 'Active' : 'Disabled'}
+                      {customer.account_status === "active" ? "Active" : "Disabled"}
                     </span>
                   </td>
 
-                  <td className="px-6 py-5">
-                    {customer.relationship_manager}
-                  </td>
+                  <td className="px-6 py-5">{customer.relationship_manager}</td>
 
                   <td className="px-6 py-5 text-center">
-
                     <button
-                      onClick={() =>
-                        openCustomer(customer)
-                      }
+                      onClick={() => openCustomer(customer)}
                       className="rounded-xl border p-3 transition hover:bg-slate-100"
                     >
-
                       <Eye size={18} />
-
                     </button>
-
                   </td>
-
                 </tr>
               );
             })}
-
           </tbody>
-
         </table>
-
       </section>
 
-      <CustomerDetailsDrawer
-        customer={selectedCustomer}
-        open={drawerOpen}
-        onClose={closeDrawer}
-      />
+      <CustomerDetailsDrawer customer={selectedCustomer} open={drawerOpen} onClose={closeDrawer} />
 
-      <CreateMerchantModal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onSuccess={() => loadCustomers()}
-      />
+      <CreateMerchantModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} onSuccess={() => loadCustomers()} />
     </>
   );
 }

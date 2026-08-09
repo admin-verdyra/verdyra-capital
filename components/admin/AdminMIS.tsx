@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { Users, IndianRupee } from "lucide-react";
 
 import { type ApplicationMIS } from "@/lib/admin/dashboard";
@@ -44,14 +45,31 @@ function StatusCard({
   count,
   amount,
   colorClass,
+  isSelected,
+  onClick,
 }: {
   title: string;
   count: number;
   amount: number;
   colorClass: string;
+  isSelected: boolean;
+  onClick: () => void;
 }) {
   return (
-    <div className={`rounded-[24px] border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg ${colorClass}`}>
+    <div
+      className={`rounded-[24px] border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg cursor-pointer ${colorClass} ${
+        isSelected ? "ring-2 ring-offset-2 ring-offset-white" : ""
+      }`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -73,11 +91,30 @@ function StatusCard({
 
 interface AdminMISProps {
   data: ApplicationMIS;
+  selectedStatus: string | null;
 }
 
-export default function AdminMIS({ data }: AdminMISProps) {
+export default function AdminMIS({ data, selectedStatus }: AdminMISProps) {
   const mis = data;
   const statuses = [...APPLICATION_STATUSES];
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  function handleStatusClick(status: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (status === "Not Set") {
+      params.set("application_status", "Not Set");
+    } else {
+      params.set("application_status", status);
+    }
+    router.push(`/admin/dashboard?${params.toString()}`);
+  }
+
+  function handleClearFilter() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("application_status");
+    router.push(`/admin/dashboard?${params.toString()}`);
+  }
 
   return (
     <div className="space-y-8">
@@ -143,6 +180,18 @@ export default function AdminMIS({ data }: AdminMISProps) {
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-slate-900">Application Pipeline / MIS</h2>
+          {selectedStatus && (
+            <button
+              onClick={handleClearFilter}
+              className="text-sm font-medium text-[#0F5A3A] hover:underline flex items-center gap-1"
+            >
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <line x1={18} y1={6} x2={6} y2={18} />
+                <line x1={6} y1={6} x2={18} y2={18} />
+              </svg>
+              Clear Filter
+            </button>
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -153,6 +202,8 @@ export default function AdminMIS({ data }: AdminMISProps) {
               count={mis.byStatus[status].count}
               amount={mis.byStatus[status].amount}
               colorClass={STATUS_COLORS[status]}
+              isSelected={selectedStatus === status}
+              onClick={() => handleStatusClick(status)}
             />
           ))}
 
@@ -161,6 +212,8 @@ export default function AdminMIS({ data }: AdminMISProps) {
             count={mis.notSet.count}
             amount={mis.notSet.amount}
             colorClass={NOT_SET_COLOR}
+            isSelected={selectedStatus === "Not Set"}
+            onClick={() => handleStatusClick("Not Set")}
           />
         </div>
       </section>
