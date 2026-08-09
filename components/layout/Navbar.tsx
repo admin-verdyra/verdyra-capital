@@ -112,13 +112,6 @@ export default function Navbar() {
   </Link>
 
   <Link
-    href="/admin"
-    className="inline-flex h-12 items-center justify-center rounded-full border border-slate-800 px-6 text-[15px] font-semibold text-slate-800 transition hover:bg-slate-100"
-  >
-    Admin Login
-  </Link>
-
-  <Link
     href={getHref("#eligibility")}
     onClick={(e) => handleClick(e, "#eligibility")}
     className="inline-flex h-12 items-center justify-center rounded-full bg-[#0F6B47] px-6 text-[15px] font-semibold text-white transition hover:bg-[#0A5638]"
@@ -183,13 +176,6 @@ export default function Navbar() {
               >
                 Customer Portal
               </Link>
-              <Link
-  href="/admin"
-  onClick={() => setOpen(false)}
-  className="mt-2 inline-flex w-full items-center justify-center rounded-full border border-slate-800 px-4 py-3 text-sm font-semibold text-slate-800"
->
-  Admin Login
-</Link>
 
               <Link
                 href={getHref("#eligibility")}
