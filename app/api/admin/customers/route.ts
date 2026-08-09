@@ -8,6 +8,11 @@ import {
 } from "@/lib/server/supabaseAuth.server";
 import { createSupabaseServiceRoleClient } from "@/lib/server/supabase.server";
 import { sendWelcomeEmail } from "@/lib/server/email.server";
+import {
+  isValidStatus,
+  APPLICATION_STATUSES,
+  type ApplicationStatus,
+} from "@/lib/admin/applicationStatus";
 
 type CreateCustomerRequest = {
   username?: unknown;
@@ -61,6 +66,7 @@ type SafeCustomer = {
   relationship_manager_phone: string | null;
   auth_user_id: string;
   account_status: 'active' | 'disabled';
+  application_status: string | null;
 };
 
 function validateEmail(email: unknown): email is string {
@@ -132,6 +138,7 @@ function toSafeCustomer(data: {
   relationship_manager_phone: string | null;
   auth_user_id: string;
   account_status: 'active' | 'disabled';
+  application_status: string | null;
 }): SafeCustomer {
   return {
     id: data.id,
@@ -146,6 +153,7 @@ function toSafeCustomer(data: {
     relationship_manager_phone: data.relationship_manager_phone,
     auth_user_id: data.auth_user_id,
     account_status: data.account_status,
+    application_status: data.application_status,
   };
 }
 
@@ -173,9 +181,96 @@ export async function PATCH(request: Request) {
 
     // Check if this is an account_status update (discriminator)
     const hasAccountStatus = 'account_status' in body;
+    const hasApplicationStatusOnly =
+      'application_status' in body &&
+      Object.keys(body).every((k) => k === 'username' || k === 'application_status');
     const hasCustomerFields = Object.keys(body).some(
-      (k) => k !== 'username' && k !== 'account_status'
+      (k) => k !== 'username' && k !== 'account_status' && k !== 'application_status'
     );
+
+    // Handle application_status-only update
+    if (hasApplicationStatusOnly) {
+      const body_typed = body as { username?: unknown; application_status?: unknown };
+
+      const username = body_typed.username?.toString().trim();
+      const applicationStatus =
+        typeof body_typed.application_status === "string"
+          ? body_typed.application_status.trim() || null
+          : null;
+
+      if (!username) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Username is required.",
+          },
+          { status: 400 }
+        );
+      }
+
+      if (applicationStatus === null) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Application status is required.",
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate that the requested status is one of the 9 valid statuses
+      if (!isValidStatus(applicationStatus)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Invalid application status. Must be one of: ${APPLICATION_STATUSES.join(", ")}.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      const supabase = createSupabaseServiceRoleClient();
+
+      // Update only application_status
+      const { data: updatedCustomer, error: updateError } = await supabase
+        .from("customers")
+        .update({ application_status: applicationStatus })
+        .eq("username", username)
+        .select(
+          "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status, application_status"
+        )
+        .single();
+
+      if (updateError || !updatedCustomer) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Customer not found or update failed.",
+          },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Application status updated successfully.",
+        customer: toSafeCustomer({
+          id: updatedCustomer.id,
+          username: updatedCustomer.username,
+          full_name: updatedCustomer.full_name,
+          email: updatedCustomer.email,
+          company: updatedCustomer.company,
+          phone: updatedCustomer.phone,
+          date_of_birth: updatedCustomer.date_of_birth,
+          relationship_manager: updatedCustomer.relationship_manager,
+          relationship_manager_email: updatedCustomer.relationship_manager_email,
+          relationship_manager_phone: updatedCustomer.relationship_manager_phone,
+          auth_user_id: updatedCustomer.auth_user_id,
+          account_status: updatedCustomer.account_status,
+          application_status: updatedCustomer.application_status,
+        }),
+      });
+    }
 
     // Handle account status update
     if (hasAccountStatus && !hasCustomerFields) {
@@ -214,7 +309,7 @@ export async function PATCH(request: Request) {
         })
         .eq("username", username)
         .select(
-          "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status"
+          "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status, application_status"
         )
         .single();
 
@@ -244,6 +339,7 @@ export async function PATCH(request: Request) {
           relationship_manager_phone: updatedCustomer.relationship_manager_phone,
           auth_user_id: updatedCustomer.auth_user_id,
           account_status: updatedCustomer.account_status,
+          application_status: updatedCustomer.application_status,
         }),
       });
     }
@@ -281,6 +377,7 @@ export async function PATCH(request: Request) {
       typeof body_typed.application_status === "string"
         ? body_typed.application_status.trim() || null
         : null;
+
     const relationshipManager =
       typeof body_typed.relationship_manager === "string"
         ? body_typed.relationship_manager.trim() || null
@@ -427,6 +524,19 @@ export async function PATCH(request: Request) {
       );
     }
 
+    // Validate application status if provided
+    if (applicationStatus !== undefined && applicationStatus !== null) {
+      if (!isValidStatus(applicationStatus)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Invalid application status. Must be one of: ${APPLICATION_STATUSES.join(", ")}.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const supabase = createSupabaseServiceRoleClient();
 
     // 3. Get current customer to check auth_user_id and current email
@@ -536,7 +646,7 @@ export async function PATCH(request: Request) {
       .update(updateData)
       .eq("username", username)
       .select(
-        "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status"
+        "id, username, full_name, email, company, phone, date_of_birth, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, account_status, application_status"
       )
       .single();
 
@@ -581,6 +691,7 @@ export async function PATCH(request: Request) {
         relationship_manager_phone: updatedCustomer.relationship_manager_phone,
         auth_user_id: updatedCustomer.auth_user_id,
         account_status: updatedCustomer.account_status,
+        application_status: updatedCustomer.application_status,
       }),
     });
   } catch (error) {
@@ -803,10 +914,8 @@ export async function POST(request: Request) {
       typeof body_typed.product === "string"
         ? body_typed.product.trim() || null
         : null;
-    const applicationStatus =
-      typeof body_typed.application_status === "string"
-        ? body_typed.application_status.trim() || null
-        : null;
+    // application_status defaults to "Application Received" server-side for new merchants
+    const applicationStatus = "Application Received";
     const relationshipManager =
       typeof body_typed.relationship_manager === "string"
         ? body_typed.relationship_manager.trim() || null
@@ -904,7 +1013,7 @@ export async function POST(request: Request) {
           auth_user_id: authUserId,
         })
         .select(
-          "id, username, full_name, email, company, phone, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id"
+          "id, username, full_name, email, company, phone, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, application_status"
         )
         .single();
 
@@ -988,6 +1097,7 @@ export async function POST(request: Request) {
         relationship_manager_phone: newCustomer.relationship_manager_phone,
         auth_user_id: newCustomer.auth_user_id,
         account_status: 'active',
+        application_status: newCustomer.application_status ?? null,
       }),
     });
   } catch (error) {

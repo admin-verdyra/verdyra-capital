@@ -18,7 +18,6 @@ type FormData = {
   phone: string;
   loan_amount: string;
   product: string;
-  application_status: string;
   relationship_manager: string;
   relationship_manager_email: string;
   relationship_manager_phone: string;
@@ -40,7 +39,6 @@ export default function CreateMerchantModal({
     phone: "",
     loan_amount: "",
     product: "",
-    application_status: "",
     relationship_manager: "",
     relationship_manager_email: "",
     relationship_manager_phone: "",
@@ -115,8 +113,6 @@ export default function CreateMerchantModal({
               ? Number(formData.loan_amount)
               : null,
             product: formData.product || null,
-            application_status:
-              formData.application_status || null,
             relationship_manager:
               formData.relationship_manager || null,
             relationship_manager_email:
@@ -157,7 +153,6 @@ export default function CreateMerchantModal({
           phone: "",
           loan_amount: "",
           product: "",
-          application_status: "",
           relationship_manager: "",
           relationship_manager_email: "",
           relationship_manager_phone: "",
@@ -329,27 +324,7 @@ export default function CreateMerchantModal({
                 </option>
               </select>
 
-              <select
-                name="application_status"
-                value={formData.application_status}
-                onChange={handleInputChange}
-                disabled={loading}
-                className="rounded-xl border border-slate-200 px-4 py-3 disabled:opacity-50 text-slate-600"
-              >
-                <option value="">Select Status</option>
-                <option value="Application Received">
-                  Application Received
-                </option>
-                <option value="In Review">
-                  In Review
-                </option>
-                <option value="Approved">
-                  Approved
-                </option>
-                <option value="Rejected">
-                  Rejected
-                </option>
-              </select>
+
 
               <input
                 type="text"

@@ -138,7 +138,7 @@ function ProfilePage() {
       )}
 
       {/* Funding Information */}
-      {(customer.loan_amount || customer.product || customer.application_status) && (
+      {(customer.loan_amount || customer.product) && (
         <Card className="rounded-2xl border-slate-200">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -168,17 +168,6 @@ function ProfilePage() {
                 <p className="mt-2 break-words text-base font-semibold text-slate-900">
                   {formatCurrency(customer.loan_amount)}
                 </p>
-              </div>
-            )}
-
-            {customer.application_status && (
-              <div className="rounded-xl border border-slate-200 bg-[#F8FAF9] p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Application Status</p>
-                <div className="mt-2">
-                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(customer.application_status)}`}>
-                    {customer.application_status}
-                  </span>
-                </div>
               </div>
             )}
           </div>

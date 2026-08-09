@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Mail,
@@ -11,7 +11,6 @@ import {
   CalendarDays,
   Phone,
   Building2,
-  Cake,
   Save,
   Loader2,
   AlertCircle,
@@ -39,6 +38,24 @@ export default function CustomerDetailsDrawer({
   const [formData, setFormData] = useState<Partial<Customer>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Pre-populate form data when entering edit mode
+  useEffect(() => {
+    if (editMode && customer) {
+      setFormData({
+        full_name: customer.full_name,
+        email: customer.email,
+        phone: customer.phone,
+        company: customer.company,
+        loan_amount: customer.loan_amount,
+        product: customer.product,
+        relationship_manager: customer.relationship_manager,
+        relationship_manager_phone: customer.relationship_manager_phone,
+        expected_approval_date: customer.expected_approval_date,
+        progress: customer.progress,
+      });
+    }
+  }, [editMode, customer]);
 
   async function handleAccountStatusChange(newStatus: 'active' | 'disabled') {
     if (!customer) return;
@@ -76,10 +93,8 @@ export default function CustomerDetailsDrawer({
         email: customer.email,
         phone: customer.phone,
         company: customer.company,
-        date_of_birth: customer.date_of_birth,
         loan_amount: customer.loan_amount,
         product: customer.product,
-        application_status: customer.application_status,
         relationship_manager: customer.relationship_manager,
         relationship_manager_phone: customer.relationship_manager_phone,
         expected_approval_date: customer.expected_approval_date,
@@ -236,13 +251,6 @@ export default function CustomerDetailsDrawer({
                   onChange={(v) => handleInputChange("company", v || null)}
                   maxLength={255}
                 />
-                <EditField
-                  label="Date of Birth"
-                  icon={<Cake size={20} />}
-                  type="date"
-                  value={formData.date_of_birth || ""}
-                  onChange={(v) => handleInputChange("date_of_birth", v || null)}
-                />
               </>
             ) : (
               <>
@@ -265,11 +273,6 @@ export default function CustomerDetailsDrawer({
                   icon={<Building2 size={20} />}
                   label="Company"
                   value={customer.company ?? "-"}
-                />
-                <InfoRow
-                  icon={<Cake size={20} />}
-                  label="Date of Birth"
-                  value={customer.date_of_birth ?? "-"}
                 />
               </>
             )}
@@ -296,13 +299,6 @@ export default function CustomerDetailsDrawer({
                   value={formData.product || ""}
                   onChange={(v) => handleInputChange("product", v || null)}
                   options={["Business Loan", "Personal Loan"]}
-                />
-                <EditSelect
-                  label="Application Status"
-                  icon={<CircleCheckBig size={20} />}
-                  value={formData.application_status || ""}
-                  onChange={(v) => handleInputChange("application_status", v || null)}
-                  options={["Submitted", "Under Review", "Approved", "Rejected", "Disbursed"]}
                 />
                 <EditField
                   label="Expected Approval Date"
@@ -336,11 +332,6 @@ export default function CustomerDetailsDrawer({
                   icon={<BriefcaseBusiness size={20} />}
                   label="Product"
                   value={customer.product ?? "-"}
-                />
-                <InfoRow
-                  icon={<CircleCheckBig size={20} />}
-                  label="Application Status"
-                  value={customer.application_status ?? "-"}
                 />
                 <InfoRow
                   icon={<CalendarDays size={20} />}
