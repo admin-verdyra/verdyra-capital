@@ -45,6 +45,22 @@ export type AdminSessionResult = {
   session: Session | null;
 };
 
+export class AdminAuthorizationError extends Error {
+  code = "ADMIN_AUTHORIZATION_ERROR";
+  constructor(message: string) {
+    super(message);
+    this.name = "AdminAuthorizationError";
+  }
+}
+
+export class AdminRoleError extends Error {
+  code = "ADMIN_ROLE_ERROR";
+  constructor(message: string) {
+    super(message);
+    this.name = "AdminRoleError";
+  }
+}
+
 function toSafeAdmin(admin: AdminRecord): SafeAdmin {
   if (!admin.auth_user_id) {
     throw new Error("Admin is not linked to Supabase Auth.");
@@ -224,6 +240,53 @@ export async function requireAdmin(): Promise<SafeAdmin> {
   }
 
   return result.admin;
+}
+
+export async function requireSuperAdmin(): Promise<SafeAdmin> {
+  const admin = await requireAdmin();
+
+  if (admin.role !== "Super Admin") {
+    throw new AdminAuthorizationError(
+      "Super Admin access required."
+    );
+  }
+
+  return admin;
+}
+
+export async function requireAdminRole(): Promise<SafeAdmin> {
+  const admin = await requireAdmin();
+
+  const validRoles = ["Super Admin", "Admin"];
+
+  if (!validRoles.includes(admin.role)) {
+    throw new AdminRoleError(
+      `Invalid admin role: ${admin.role}. Supported roles: ${validRoles.join(", ")}`
+    );
+  }
+
+  return admin;
+}
+
+export function isSuperAdmin(admin: SafeAdmin): boolean {
+  return admin.role === "Super Admin";
+}
+
+export function canAccessMerchant(
+  admin: SafeAdmin,
+  merchantCreatedByAdminId: string | null
+): boolean {
+  // Super Admin passes ownership checks automatically
+  if (isSuperAdmin(admin)) {
+    return true;
+  }
+
+  // Normal Admin: must have a non-NULL created_by_admin_id that matches their id
+  if (merchantCreatedByAdminId === null) {
+    return false;
+  }
+
+  return merchantCreatedByAdminId === admin.id;
 }
 
 async function getVerifiedUser(

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requireAdmin } from "@/lib/server/adminAuth.server";
+import { requireAdmin, requireSuperAdmin, isSuperAdmin, canAccessMerchant } from "@/lib/server/adminAuth.server";
 import {
   createSupabaseAuthUser,
   deleteSupabaseAuthUser,
@@ -163,9 +163,10 @@ function validateAccountStatus(status: unknown): status is 'active' | 'disabled'
 
 export async function PATCH(request: Request) {
   try {
-    // 1. Verify authenticated admin
+    // 1. Verify authenticated admin and get admin info
+    let admin;
     try {
-      await requireAdmin();
+      admin = await requireAdmin();
     } catch {
       return NextResponse.json(
         {
@@ -175,6 +176,8 @@ export async function PATCH(request: Request) {
         { status: 401 }
       );
     }
+
+    const superAdmin = isSuperAdmin(admin);
 
     // 2. Validate request data
     const body = await request.json();
@@ -187,6 +190,20 @@ export async function PATCH(request: Request) {
     const hasCustomerFields = Object.keys(body).some(
       (k) => k !== 'username' && k !== 'account_status' && k !== 'application_status'
     );
+
+    // Helper: fetch target merchant to get created_by_admin_id
+    const getTargetMerchant = async (username: string) => {
+      const supabase = createSupabaseServiceRoleClient();
+      const { data, error } = await supabase
+        .from("customers")
+        .select("id, created_by_admin_id, account_status")
+        .eq("username", username)
+        .maybeSingle();
+      if (error && error.code !== "PGRST116") {
+        throw error;
+      }
+      return data;
+    };
 
     // Handle application_status-only update
     if (hasApplicationStatusOnly) {
@@ -227,6 +244,31 @@ export async function PATCH(request: Request) {
           },
           { status: 400 }
         );
+      }
+
+      // Fetch target merchant for authorization
+      const targetMerchant = await getTargetMerchant(username);
+      if (!targetMerchant) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Customer not found.",
+          },
+          { status: 404 }
+        );
+      }
+
+      // Authorization: Normal Admin can only update application_status if they own the merchant
+      if (!superAdmin) {
+        if (!canAccessMerchant(admin, targetMerchant.created_by_admin_id)) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: "Forbidden: You can only update application status for merchants you created.",
+            },
+            { status: 403 }
+          );
+        }
       }
 
       const supabase = createSupabaseServiceRoleClient();
@@ -299,6 +341,29 @@ export async function PATCH(request: Request) {
         );
       }
 
+      // Fetch target merchant for authorization
+      const targetMerchant = await getTargetMerchant(username);
+      if (!targetMerchant) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Customer not found.",
+          },
+          { status: 404 }
+        );
+      }
+
+      // Authorization: Normal Admin cannot change account_status at all
+      if (!superAdmin) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Forbidden: Only Super Admin can change account status.",
+          },
+          { status: 403 }
+        );
+      }
+
       // Update account status
       const supabase = createSupabaseServiceRoleClient();
 
@@ -356,6 +421,29 @@ export async function PATCH(request: Request) {
           message: "Username is required.",
         },
         { status: 400 }
+      );
+    }
+
+    // Fetch target merchant for authorization
+    const targetMerchant = await getTargetMerchant(username);
+    if (!targetMerchant) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Customer not found.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Authorization: Normal Admin cannot update any customer profile fields
+    if (!superAdmin) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Forbidden: Only Super Admin can update merchant profile fields.",
+        },
+        { status: 403 }
       );
     }
 
@@ -710,14 +798,14 @@ export async function PATCH(request: Request) {
 export async function DELETE(request: Request) {
   try {
     try {
-      await requireAdmin();
+      await requireSuperAdmin();
     } catch {
       return NextResponse.json(
         {
           success: false,
-          message: "Admin authentication required.",
+          message: "Super Admin access required.",
         },
-        { status: 401 }
+        { status: 403 }
       );
     }
 
@@ -837,11 +925,96 @@ export async function DELETE(request: Request) {
   }
 }
 
+export async function GET(request: Request) {
+  try {
+    // 1. Verify authenticated admin
+    let admin;
+    try {
+      admin = await requireAdmin();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Admin authentication required.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const superAdmin = isSuperAdmin(admin);
+
+    const supabase = createSupabaseServiceRoleClient();
+
+    // 2. Build query based on admin role
+    let query = supabase
+      .from("customers")
+      .select(
+        "id, username, full_name, email, company, phone, date_of_birth, loan_amount, product, application_status, account_status, relationship_manager, relationship_manager_email, relationship_manager_phone, expected_approval_date, progress, auth_user_id, created_by_admin_id"
+      )
+      .order("full_name");
+
+    // Normal Admin: only see customers they created
+    if (!superAdmin) {
+      query = query.eq("created_by_admin_id", admin.id);
+    }
+
+    const { data: customers, error } = await query;
+
+    if (error) {
+      console.error("Customer listing failed:", error);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to fetch customers.",
+        },
+        { status: 500 }
+      );
+    }
+
+    // 3. Transform to match Customer type expected by CustomerTable
+    const safeCustomers = (customers ?? []).map((c) => ({
+      id: c.id,
+      username: c.username,
+      full_name: c.full_name,
+      email: c.email,
+      company: c.company,
+      phone: c.phone,
+      date_of_birth: c.date_of_birth,
+      loan_amount: c.loan_amount,
+      product: c.product,
+      application_status: c.application_status,
+      account_status: c.account_status,
+      relationship_manager: c.relationship_manager,
+      relationship_manager_email: c.relationship_manager_email,
+      relationship_manager_phone: c.relationship_manager_phone,
+      expected_approval_date: c.expected_approval_date,
+      progress: c.progress,
+      auth_user_id: c.auth_user_id,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      customers: safeCustomers,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Customer listing could not be completed.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     // 1. Verify authenticated admin
+    let admin;
     try {
-      await requireAdmin();
+      admin = await requireAdmin();
     } catch {
       return NextResponse.json(
         {
@@ -1011,6 +1184,7 @@ export async function POST(request: Request) {
           expected_approval_date: expectedApprovalDate,
           progress: progress,
           auth_user_id: authUserId,
+          created_by_admin_id: admin.id,
         })
         .select(
           "id, username, full_name, email, company, phone, relationship_manager, relationship_manager_email, relationship_manager_phone, auth_user_id, application_status"

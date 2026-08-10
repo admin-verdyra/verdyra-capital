@@ -2,17 +2,21 @@ import { supabase } from "@/lib/supabase";
 import type { Customer } from "@/components/portal/types";
 
 export async function getCustomers(): Promise<Customer[]> {
-  const { data, error } = await supabase
-    .from("customers")
-    .select("*")
-    .order("full_name");
+  const response = await fetch("/api/admin/customers", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-  if (error) {
-    console.error(error);
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    console.error("Failed to fetch customers:", result.message);
     return [];
   }
 
-  return (data ?? []) as Customer[];
+  return (result.customers ?? []) as Customer[];
 }
 
 export async function getCustomer(
