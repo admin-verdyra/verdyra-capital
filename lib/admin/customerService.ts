@@ -1,5 +1,3 @@
-import { supabase } from "@/lib/supabase";
-
 export type AdminCustomer = {
   auth_user_id?: string | null;
 
@@ -20,29 +18,13 @@ export type AdminCustomer = {
 };
 
 export async function getAllCustomers(): Promise<AdminCustomer[]> {
-  const { data, error } = await supabase
-    .from("customers")
-    .select(`
-      username,
-      full_name,
-      email,
-      company,
-      phone,
-      date_of_birth,
-      application_status,
-      account_status,
-      relationship_manager,
-      relationship_manager_phone,
-      loan_amount,
-      product,
-      expected_approval_date,
-      progress
-    `)
-    .order("full_name");
+  const response = await fetch("/api/admin/customers", { method: "GET" });
 
-  if (error) {
-    throw error;
+  const result = await response.json();
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message ?? "Failed to fetch customers.");
   }
 
-  return (data ?? []) as AdminCustomer[];
+  return result.customers as AdminCustomer[];
 }

@@ -8,7 +8,6 @@ import {
   Download,
 } from "lucide-react";
 
-import { getSignedUrl } from "@/lib/documents/documentService";
 import type { CustomerDocument } from "@/lib/documents/documentService";
 
 type Props = {
@@ -35,9 +34,17 @@ export default function ReviewPreviewModal({
       try {
         setLoading(true);
 
-        const signed = await getSignedUrl(doc.file_path);
+        const response = await fetch(`/api/admin/documents/signed-url?document_id=${encodeURIComponent(doc.id)}`, {
+          method: "GET",
+        });
 
-        setUrl(signed);
+        const result = await response.json();
+
+        if (!response.ok || result.success === false) {
+          throw new Error(result.message ?? "Failed to generate signed URL.");
+        }
+
+        setUrl(result.signed_url);
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,6 @@
 import { createSupabaseServiceRoleClient } from "@/lib/server/supabase.server";
 import { APPLICATION_STATUSES } from "@/lib/admin/applicationStatus";
+import { SafeAdmin, isSuperAdmin } from "@/lib/server/adminAuth.server";
 
 /**
  * Status-wise MIS data for a single status
@@ -48,11 +49,18 @@ type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
  *
  * All aggregation is performed server-side.
  */
-export async function getApplicationMIS(): Promise<ApplicationMIS> {
+export async function getApplicationMIS(admin: SafeAdmin): Promise<ApplicationMIS> {
   const supabase = createSupabaseServiceRoleClient();
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("customers")
     .select("loan_amount, application_status");
+
+  if (!isSuperAdmin(admin)) {
+    query = query.eq("created_by_admin_id", admin.id);
+  }
+
+  const { data, error } = await query;
 
   if (error || !data) {
     // Return zeroed structure on error
@@ -129,8 +137,8 @@ function getZeroedMIS(): ApplicationMIS {
  * Legacy function - kept for backward compatibility with AdminStats component
  * @deprecated Use getApplicationMIS() instead
  */
-export async function getDashboardStats(): Promise<DashboardStats> {
-  const mis = await getApplicationMIS();
+export async function getDashboardStats(admin: SafeAdmin): Promise<DashboardStats> {
+  const mis = await getApplicationMIS(admin);
 
   // Calculate approved as Approved + Disbursed (legacy behavior)
   const approved = mis.byStatus.Approved.count + mis.byStatus.Disbursed.count;

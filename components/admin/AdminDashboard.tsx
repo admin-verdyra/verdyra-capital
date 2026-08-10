@@ -2,6 +2,7 @@ import { getApplicationMIS } from "@/lib/admin/dashboard";
 import CustomerTable from "./customers/CustomerTable";
 import AdminMIS from "./AdminMIS";
 import { APPLICATION_STATUSES } from "@/lib/admin/applicationStatus";
+import { requireAdmin } from "@/lib/server/adminAuth.server";
 
 interface AdminDashboardProps {
   searchParams: Promise<{ application_status?: string }>;
@@ -18,7 +19,10 @@ export default async function AdminDashboard({ searchParams }: AdminDashboardPro
       ? "Not Set"
       : null;
 
-  const mis = await getApplicationMIS();
+  // Authenticate admin server-side
+  const admin = await requireAdmin();
+
+  const mis = await getApplicationMIS(admin);
 
   return (
     <div className="space-y-8">
