@@ -20,7 +20,6 @@ export const ADMIN_REFRESH_TOKEN_COOKIE =
 type AdminRecord = {
   id: string;
   username: string;
-  password: string;
   full_name: string;
   email: string | null;
   role: string | null;
@@ -61,28 +60,6 @@ function toSafeAdmin(admin: AdminRecord): SafeAdmin {
   };
 }
 
-async function getAdminByLegacyCredentials(
-  username: string,
-  password: string
-): Promise<AdminRecord | null> {
-  const supabase = createSupabaseServiceRoleClient();
-
-  const { data, error } = await supabase
-    .from("admins")
-    .select(
-      "id, username, password, full_name, email, role, auth_user_id"
-    )
-    .eq("username", username.trim())
-    .eq("password", password)
-    .maybeSingle<AdminRecord>();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
 async function getAdminByAuthUserId(
   authUserId: string
 ): Promise<AdminRecord | null> {
@@ -91,7 +68,7 @@ async function getAdminByAuthUserId(
   const { data, error } = await supabase
     .from("admins")
     .select(
-      "id, username, password, full_name, email, role, auth_user_id"
+      "id, username, full_name, email, role, auth_user_id"
     )
     .eq("auth_user_id", authUserId)
     .maybeSingle<AdminRecord>();
@@ -101,56 +78,6 @@ async function getAdminByAuthUserId(
   }
 
   return data;
-}
-
-async function linkAdminAuthUser(
-  admin: AdminRecord,
-  password: string
-): Promise<AdminRecord> {
-  if (admin.auth_user_id) {
-    return admin;
-  }
-
-  if (!admin.email) {
-    throw new Error(
-      "This admin needs an email before Supabase Auth can be linked."
-    );
-  }
-
-  const existingUser =
-    await findSupabaseAuthUserByEmail(admin.email);
-
-  if (existingUser) {
-    const session = await signInAdminAuthUser(
-      admin.email,
-      password
-    );
-
-    if (session.user.id !== existingUser.id) {
-      throw new Error(
-        "Existing Supabase Auth user does not match this admin."
-      );
-    }
-
-    return updateAdminAuthUserId(admin.username, existingUser.id);
-  }
-
-  const user = await createSupabaseAuthUser({
-    email: admin.email,
-    password,
-    emailConfirm: true,
-    userMetadata: {
-      admin_username: admin.username,
-      role: admin.role ?? "Admin",
-    },
-  });
-
-  try {
-    return await updateAdminAuthUserId(admin.username, user.id);
-  } catch (error) {
-    await deleteSupabaseAuthUser(user.id);
-    throw error;
-  }
 }
 
 async function updateAdminAuthUserId(
@@ -166,7 +93,7 @@ async function updateAdminAuthUserId(
     })
     .eq("username", username)
     .select(
-      "id, username, password, full_name, email, role, auth_user_id"
+      "id, username, full_name, email, role, auth_user_id"
     )
     .single<AdminRecord>();
 
@@ -175,28 +102,6 @@ async function updateAdminAuthUserId(
   }
 
   return data;
-}
-
-async function signInAdminAuthUser(
-  email: string | null,
-  password: string
-): Promise<Session> {
-  if (!email) {
-    throw new Error("This admin does not have an email address.");
-  }
-
-  const supabase = createSupabaseServerAnonClient();
-  const { data, error } =
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-  if (error || !data.session) {
-    throw error ?? new Error("Supabase Auth did not return a session.");
-  }
-
-  return data.session;
 }
 
 export async function loginAdminWithSupabaseAuth(
