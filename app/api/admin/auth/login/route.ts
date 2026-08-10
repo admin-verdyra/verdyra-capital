@@ -9,16 +9,16 @@ import {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const username =
-      typeof body.username === "string" ? body.username : "";
+    const email =
+      typeof body.email === "string" ? body.email : "";
     const password =
       typeof body.password === "string" ? body.password : "";
 
-    if (!username.trim() || !password) {
+    if (!email.trim() || !password) {
       return NextResponse.json(
         {
           success: false,
-          message: "Please enter username and password.",
+          message: "Please enter email and password.",
         },
         {
           status: 400,
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const result = await loginAdminWithSupabaseAuth(
-      username,
+      email,
       password
     );
 

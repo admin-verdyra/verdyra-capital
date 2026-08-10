@@ -200,33 +200,42 @@ async function signInAdminAuthUser(
 }
 
 export async function loginAdminWithSupabaseAuth(
-  username: string,
+  email: string,
   password: string
 ): Promise<AdminLoginResult | null> {
-  const legacyAdmin =
-    await getAdminByLegacyCredentials(username, password);
+  const normalizedEmail = email.trim().toLowerCase();
 
-  if (!legacyAdmin) {
+  if (!normalizedEmail || !password) {
     return null;
   }
 
-  const linkedAdmin =
-    await linkAdminAuthUser(legacyAdmin, password);
+  // Authenticate directly through Supabase Auth
+  const supabase = createSupabaseServerAnonClient();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: normalizedEmail,
+    password,
+  });
 
-  const session = await signInAdminAuthUser(
-    linkedAdmin.email,
-    password
-  );
+  if (error || !data.session || !data.user) {
+    return null;
+  }
 
-  if (session.user.id !== linkedAdmin.auth_user_id) {
-    throw new Error(
-      "Supabase Auth user does not match the linked admin record."
-    );
+  // Resolve the corresponding admin record by auth_user_id
+  const admin = await getAdminByAuthUserId(data.user.id);
+
+  if (!admin) {
+    // Supabase Auth user exists but no admin record - not authorized
+    return null;
+  }
+
+  // Verify the email matches (defense in depth)
+  if (admin.email?.toLowerCase() !== normalizedEmail) {
+    return null;
   }
 
   return {
-    admin: toSafeAdmin(linkedAdmin),
-    session,
+    admin: toSafeAdmin(admin),
+    session: data.session,
   };
 }
 

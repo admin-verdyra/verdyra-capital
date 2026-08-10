@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Shield, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Shield, Loader2, ArrowLeft } from "lucide-react";
 
 export default function AdminLogin() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [captchaChecked, setCaptchaChecked] = useState(false);
@@ -18,8 +18,8 @@ export default function AdminLogin() {
   async function handleLogin() {
     setError("");
 
-    if (!username.trim() || !password) {
-      setError("Please enter username and password.");
+    if (!email.trim() || !password) {
+      setError("Please enter email and password.");
       return;
     }
 
@@ -38,7 +38,7 @@ export default function AdminLogin() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          username,
+          email,
           password,
         }),
       });
@@ -83,13 +83,13 @@ export default function AdminLogin() {
 
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700">
-            Username
+            Email
           </label>
           <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-[#0F5A3A] focus:ring-2 focus:ring-[#0F5A3A]/20 focus:outline-none transition-all duration-200"
-            placeholder="Enter your username"
+            placeholder="Enter your email"
             autoComplete="username"
             disabled={loading}
           />
@@ -155,6 +155,16 @@ export default function AdminLogin() {
             "Login"
           )}
         </button>
+
+        <p className="text-center text-sm text-slate-500">
+          <a
+            href="/admin/forgot-password"
+            className="text-[#0F5A3A] hover:underline font-medium flex items-center justify-center gap-1.5"
+          >
+            <ArrowLeft size={14} />
+            Forgot Password?
+          </a>
+        </p>
 
       </div>
 
