@@ -73,17 +73,30 @@ export async function getCustomerDocuments(
 }
 
 export async function getSignedUrl(
-  filePath: string
+  documentId: string
 ): Promise<string> {
-  const { data, error } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(filePath, 60 * 30);
+  const response = await fetch(
+    `/api/portal/documents/signed-url?document_id=${encodeURIComponent(
+      documentId
+    )}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
 
-  if (error) {
-    throw error;
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok || !result?.success) {
+    throw new Error(
+      result?.message ||
+        "Failed to generate document preview URL."
+    );
   }
 
-  return data.signedUrl;
+  return result.signed_url;
 }
 
 export async function updateDocumentStatus(

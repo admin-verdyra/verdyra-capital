@@ -39,7 +39,7 @@ export default function DocumentPreview({
         setLoading(true);
 
         const signedUrl = await getPreviewUrl(
-          doc.file_path
+          doc.id
         );
 
         setUrl(signedUrl);
