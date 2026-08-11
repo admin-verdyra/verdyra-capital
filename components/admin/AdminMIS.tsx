@@ -595,7 +595,8 @@ export default function AdminMIS({
     }
 
     router.push(
-      `/admin/dashboard?${params.toString()}`
+      `/admin/dashboard?${params.toString()}`,
+      { scroll: false }
     );
   }
 
@@ -610,6 +611,23 @@ export default function AdminMIS({
       `/admin/dashboard?${params.toString()}`
     );
   }
+
+  useEffect(() => {
+    if (!effectiveSelectedStatus) return;
+
+    const section = document.getElementById(
+      "application-status-details"
+    );
+
+    if (!section) return;
+
+    requestAnimationFrame(() => {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [effectiveSelectedStatus]);
 
   return (
     <div className="space-y-8">
@@ -811,7 +829,10 @@ export default function AdminMIS({
         </div>
 
         {effectiveSelectedStatus && (
-          <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+          <div
+            id="application-status-details"
+            className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm"
+          >
             <div className="border-b border-slate-200 bg-slate-50 px-6 py-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
