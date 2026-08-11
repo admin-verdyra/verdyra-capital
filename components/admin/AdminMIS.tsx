@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Users,
@@ -373,6 +374,16 @@ function AdminWisePortfolio({
   );
 }
 
+type Admin = {
+  id: string;
+  username: string;
+  full_name: string;
+  role: string;
+  account_status?: string;
+};
+
+const ALL_ADMINS = "__ALL_ADMINS__";
+
 interface AdminMISProps {
   data: ApplicationMIS;
   adminWiseMIS?: AdminWiseMIS | null;
@@ -388,13 +399,167 @@ export default function AdminMIS({
 }: AdminMISProps) {
   const mis = data;
 
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [selectedAdminId, setSelectedAdminId] =
+    useState<string>(ALL_ADMINS);
+  const [adminLoading, setAdminLoading] = useState(false);
+
+  useEffect(() => {
+    const storedAdmin = sessionStorage.getItem("admin");
+
+    if (!storedAdmin) {
+      return;
+    }
+
+    try {
+      const admin = JSON.parse(storedAdmin);
+      const superAdmin = admin?.role === "Super Admin";
+
+      setIsSuperAdmin(superAdmin);
+
+      if (!superAdmin) {
+        return;
+      }
+
+      async function loadAdmins() {
+        try {
+          setAdminLoading(true);
+
+          const response = await fetch("/api/admin/admins", {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result?.success) {
+            throw new Error(
+              result?.message || "Unable to load Admin accounts."
+            );
+          }
+
+          setAdmins(result.admins ?? []);
+        } catch (error) {
+          console.error(
+            "Failed to load Admin accounts:",
+            error
+          );
+          setAdmins([]);
+        } finally {
+          setAdminLoading(false);
+        }
+      }
+
+      loadAdmins();
+    } catch (error) {
+      console.error(
+        "Failed to read Admin session:",
+        error
+      );
+      setIsSuperAdmin(false);
+    }
+  }, []);
+
   const effectiveSelectedStatus =
     selectedStatus ?? applicationStatus ?? null;
 
   const statuses = [...APPLICATION_STATUSES];
 
+  /*
+   * Super Admin owner filter.
+   *
+   * We filter the underlying applications first and then
+   * recalculate the MIS totals/status counts so the entire
+   * Application Pipeline changes together.
+   */
+  const ownerFilteredApplications =
+    isSuperAdmin && selectedAdminId !== ALL_ADMINS
+      ? mis.applications.filter(
+          (application) =>
+            application.admin_username ===
+            admins.find(
+              (admin) => admin.id === selectedAdminId
+            )?.username
+        )
+      : mis.applications;
+
+  const filteredByOwnerMIS = (() => {
+    const byStatus = {} as ApplicationMIS["byStatus"];
+
+    APPLICATION_STATUSES.forEach((status) => {
+      byStatus[status] = {
+        count: 0,
+        amount: 0,
+      };
+    });
+
+    const notSet = {
+      count: 0,
+      amount: 0,
+    };
+
+    let totalAmount = 0;
+
+    for (const application of ownerFilteredApplications) {
+      const loanAmount =
+        application.loan_amount !== null &&
+        application.loan_amount !== undefined
+          ? Number(application.loan_amount)
+          : null;
+
+      if (loanAmount !== null && !Number.isNaN(loanAmount)) {
+        totalAmount += loanAmount;
+      }
+
+      const status = application.application_status;
+
+      if (
+        status &&
+        APPLICATION_STATUSES.includes(
+          status as ApplicationStatus
+        )
+      ) {
+        const typedStatus = status as ApplicationStatus;
+
+        byStatus[typedStatus].count++;
+
+        if (
+          loanAmount !== null &&
+          !Number.isNaN(loanAmount)
+        ) {
+          byStatus[typedStatus].amount += loanAmount;
+        }
+      } else {
+        notSet.count++;
+
+        if (
+          loanAmount !== null &&
+          !Number.isNaN(loanAmount)
+        ) {
+          notSet.amount += loanAmount;
+        }
+      }
+    }
+
+    return {
+      ...mis,
+      totals: {
+        applications: ownerFilteredApplications.length,
+        amount: totalAmount,
+      },
+      byStatus,
+      notSet,
+      applications: ownerFilteredApplications,
+    };
+  })();
+
+  const displayMIS = filteredByOwnerMIS;
+
   const filteredApplications = effectiveSelectedStatus
-    ? mis.applications.filter((application) => {
+    ? displayMIS.applications.filter((application) => {
         if (effectiveSelectedStatus === "Not Set") {
           return (
             !application.application_status ||
@@ -465,7 +630,7 @@ export default function AdminMIS({
               </p>
 
               <h2 className="mt-3 text-3xl font-bold text-slate-900">
-                {mis.totals.applications.toLocaleString()}
+                {displayMIS.totals.applications.toLocaleString()}
               </h2>
             </div>
 
@@ -484,7 +649,7 @@ export default function AdminMIS({
 
               <h2 className="mt-3 font-mono text-3xl font-bold text-slate-900">
                 {formatIndianCurrency(
-                  mis.totals.amount
+                  displayMIS.totals.amount
                 )}
               </h2>
             </div>
@@ -503,7 +668,7 @@ export default function AdminMIS({
               </p>
 
               <h2 className="mt-3 text-3xl font-bold text-slate-900">
-                {mis.notSet.count}
+                {displayMIS.notSet.count}
               </h2>
             </div>
 
@@ -545,12 +710,38 @@ export default function AdminMIS({
 
       {/* Existing Status-wise MIS */}
       <section>
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-bold text-slate-900">
             Application Pipeline / MIS
           </h2>
 
-          {effectiveSelectedStatus && (
+          <div className="flex flex-wrap items-center gap-3">
+            {isSuperAdmin && (
+              <select
+                value={selectedAdminId}
+                onChange={(e) =>
+                  setSelectedAdminId(e.target.value)
+                }
+                disabled={adminLoading}
+                aria-label="Filter Application MIS by Admin"
+                className="min-w-[230px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 outline-none focus:border-[#0F5A3A] focus:ring-2 focus:ring-[#0F5A3A]/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+              >
+                <option value={ALL_ADMINS}>
+                  All Admins
+                </option>
+
+                {admins.map((admin) => (
+                  <option
+                    key={admin.id}
+                    value={admin.id}
+                  >
+                    {admin.full_name} — {admin.role}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {effectiveSelectedStatus && (
             <button
               onClick={handleClearFilter}
               className="flex items-center gap-1 text-sm font-medium text-[#0F5A3A] hover:underline"
@@ -581,6 +772,7 @@ export default function AdminMIS({
               Clear Filter
             </button>
           )}
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -588,8 +780,8 @@ export default function AdminMIS({
             <StatusCard
               key={status}
               title={status}
-              count={mis.byStatus[status].count}
-              amount={mis.byStatus[status].amount}
+              count={displayMIS.byStatus[status].count}
+              amount={displayMIS.byStatus[status].amount}
               colorClass={
                 STATUS_COLORS[status]
               }
@@ -605,8 +797,8 @@ export default function AdminMIS({
 
           <StatusCard
             title="Not Set"
-            count={mis.notSet.count}
-            amount={mis.notSet.amount}
+            count={displayMIS.notSet.count}
+            amount={displayMIS.notSet.amount}
             colorClass={NOT_SET_COLOR}
             isSelected={
               effectiveSelectedStatus ===
