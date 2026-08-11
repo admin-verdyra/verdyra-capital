@@ -30,39 +30,25 @@ export async function uploadDocument(
   documentType: string,
   file: File
 ) {
-  const fileName = generateUniqueFileName(documentType, file.name);
+  const formData = new FormData();
 
-  const storagePath = `${username}/${fileName}`;
+  formData.append("document_type", documentType);
+  formData.append("file", file);
 
-  const { error: uploadError } = await supabase.storage
-    .from(BUCKET)
-    .upload(storagePath, file, {
-      upsert: false,
-    });
+  const response = await fetch("/api/portal/documents", {
+    method: "POST",
+    body: formData,
+  });
 
-  if (uploadError) {
-    throw uploadError;
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok || !result?.success) {
+    throw new Error(
+      result?.message || "Failed to upload document."
+    );
   }
 
-  const { data, error: dbError } = await supabase
-    .from("customer_documents")
-    .insert({
-      customer_username: username,
-      document_type: documentType,
-      file_name: file.name,
-      file_path: storagePath,
-      status: "Pending",
-      uploaded_at: new Date().toISOString(),
-      reviewed_at: null,
-      reviewed_by: null,
-      remarks: null,
-    })
-    .select();
-
-  if (dbError) {
-    console.error("DB INSERT ERROR:", dbError);
-    throw dbError;
-  }
+  return result.document;
 }
 
 export async function getCustomerDocuments(

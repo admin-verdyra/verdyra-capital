@@ -680,6 +680,10 @@ export default function AdminMIS({
                       <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                         RM Phone
                       </th>
+
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Admin / Owner
+                      </th>
                     </tr>
                   </thead>
 
@@ -727,6 +731,28 @@ export default function AdminMIS({
                         <td className="px-5 py-5 text-sm text-slate-600">
                           {application.relationship_manager_phone ||
                             "—"}
+                        </td>
+
+                        <td className="px-5 py-5">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {application.admin_full_name ||
+                                "Unassigned"}
+                            </p>
+
+                            <p className="mt-1 text-xs text-slate-500">
+                              {application.admin_username
+                                ? `@${application.admin_username}`
+                                : "—"}
+                            </p>
+
+                            {application.admin_role ===
+                              "Super Admin" && (
+                              <span className="mt-1 inline-flex rounded-full bg-[#0F5A3A]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#0F5A3A]">
+                                Super Admin
+                              </span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}

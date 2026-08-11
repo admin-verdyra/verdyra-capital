@@ -26,6 +26,9 @@ export type ApplicationMISCustomer = {
   relationship_manager: string | null;
   relationship_manager_phone: string | null;
   expected_approval_date: string | null;
+  admin_username: string | null;
+  admin_full_name: string | null;
+  admin_role: string | null;
 };
 
 export type ApplicationMIS = {
@@ -106,7 +109,7 @@ export async function getApplicationMIS(
   let query = supabase
     .from("customers")
     .select(
-      "id, username, full_name, email, company, phone, loan_amount, product, application_status, relationship_manager, relationship_manager_phone, expected_approval_date"
+      "id, username, full_name, email, company, phone, loan_amount, product, application_status, relationship_manager, relationship_manager_phone, expected_approval_date, created_by_admin_id"
     );
 
   if (!isSuperAdmin(admin)) {
@@ -118,6 +121,29 @@ export async function getApplicationMIS(
   if (error || !data) {
     return getZeroedMIS();
   }
+
+  // Fetch Admin records so the Application MIS can display
+  // merchant ownership alongside each application.
+  const { data: adminRecords, error: adminRecordsError } =
+    await supabase
+      .from("admins")
+      .select("id, username, full_name, role");
+
+  if (adminRecordsError) {
+    console.error("Application MIS admin lookup failed:", adminRecordsError);
+    return getZeroedMIS();
+  }
+
+  const adminMap = new Map(
+    (adminRecords ?? []).map((adminRecord) => [
+      adminRecord.id,
+      {
+        username: adminRecord.username,
+        full_name: adminRecord.full_name,
+        role: adminRecord.role,
+      },
+    ])
+  );
 
   const byStatus: Record<ApplicationStatus, StatusMIS> =
     {} as Record<ApplicationStatus, StatusMIS>;
@@ -189,6 +215,15 @@ export async function getApplicationMIS(
       row.relationship_manager_phone ?? null,
     expected_approval_date:
       row.expected_approval_date ?? null,
+admin_username: row.created_by_admin_id
+  ? adminMap.get(row.created_by_admin_id)?.username ?? null
+  : null,
+admin_full_name: row.created_by_admin_id
+  ? adminMap.get(row.created_by_admin_id)?.full_name ?? null
+  : null,
+admin_role: row.created_by_admin_id
+  ? adminMap.get(row.created_by_admin_id)?.role ?? null
+  : null,
   }));
 
   return {
