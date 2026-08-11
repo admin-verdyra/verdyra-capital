@@ -1,10 +1,11 @@
 "use client";
 
 import PipelineCard from "./PipelineCard";
+import type { AdminCustomer } from "@/lib/admin/customerService";
 
 type Props = {
   title: string;
-  customers: any[];
+  customers: AdminCustomer[];
 };
 
 export default function PipelineColumn({
@@ -12,31 +13,31 @@ export default function PipelineColumn({
   customers,
 }: Props) {
   return (
-    <div className="min-w-[320px] rounded-3xl bg-slate-100 p-5">
-
-      <div className="mb-5 flex items-center justify-between">
-
-        <h2 className="text-lg font-bold">
+    <div className="w-[310px] shrink-0 rounded-3xl bg-slate-100 p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="min-w-0 text-base font-bold text-slate-900">
           {title}
         </h2>
 
-        <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold">
+        <span className="shrink-0 rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow-sm">
           {customers.length}
         </span>
-
       </div>
 
-      <div className="space-y-4">
-
-        {customers.map((customer) => (
-          <PipelineCard
-            key={customer.username}
-            customer={customer}
-          />
-        ))}
-
+      <div className="min-h-[360px] space-y-4">
+        {customers.length === 0 ? (
+          <div className="flex min-h-[120px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/50 px-4 text-center text-sm text-slate-400">
+            No applications
+          </div>
+        ) : (
+          customers.map((customer) => (
+            <PipelineCard
+              key={customer.username}
+              customer={customer}
+            />
+          ))
+        )}
       </div>
-
     </div>
   );
 }

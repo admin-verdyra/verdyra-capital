@@ -13,6 +13,21 @@ export type StatusMIS = {
 /**
  * Complete Application MIS data structure.
  */
+export type ApplicationMISCustomer = {
+  id: string;
+  username: string;
+  full_name: string;
+  email: string;
+  company: string | null;
+  phone: string | null;
+  loan_amount: number | null;
+  product: string | null;
+  application_status: string | null;
+  relationship_manager: string | null;
+  relationship_manager_phone: string | null;
+  expected_approval_date: string | null;
+};
+
 export type ApplicationMIS = {
   totals: {
     applications: number;
@@ -20,6 +35,7 @@ export type ApplicationMIS = {
   };
   byStatus: Record<ApplicationStatus, StatusMIS>;
   notSet: StatusMIS;
+  applications: ApplicationMISCustomer[];
 };
 
 /**
@@ -89,7 +105,9 @@ export async function getApplicationMIS(
 
   let query = supabase
     .from("customers")
-    .select("loan_amount, application_status");
+    .select(
+      "id, username, full_name, email, company, phone, loan_amount, product, application_status, relationship_manager, relationship_manager_phone, expected_approval_date"
+    );
 
   if (!isSuperAdmin(admin)) {
     query = query.eq("created_by_admin_id", admin.id);
@@ -153,6 +171,26 @@ export async function getApplicationMIS(
     }
   }
 
+  const applications: ApplicationMISCustomer[] = data.map((row) => ({
+    id: row.id,
+    username: row.username,
+    full_name: row.full_name,
+    email: row.email,
+    company: row.company ?? null,
+    phone: row.phone ?? null,
+    loan_amount:
+      row.loan_amount !== null && row.loan_amount !== undefined
+        ? Number(row.loan_amount)
+        : null,
+    product: row.product ?? null,
+    application_status: row.application_status ?? null,
+    relationship_manager: row.relationship_manager ?? null,
+    relationship_manager_phone:
+      row.relationship_manager_phone ?? null,
+    expected_approval_date:
+      row.expected_approval_date ?? null,
+  }));
+
   return {
     totals: {
       applications: totalApplications,
@@ -160,6 +198,7 @@ export async function getApplicationMIS(
     },
     byStatus,
     notSet,
+    applications,
   };
 }
 
@@ -350,6 +389,7 @@ function getZeroedMIS(): ApplicationMIS {
       count: 0,
       amount: 0,
     },
+    applications: [],
   };
 }
 

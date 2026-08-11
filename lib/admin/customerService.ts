@@ -1,4 +1,5 @@
 export type AdminCustomer = {
+  created_by_admin_id: string | null;
   auth_user_id?: string | null;
 
   username: string;

@@ -61,3 +61,28 @@ img {
     box-sizing: border-box;
   }
 }
+
+/* Verdyra Pipeline - visible horizontal scrollbar */
+.pipeline-scrollbar {
+  scrollbar-width: auto;
+  scrollbar-color: #0F5A3A #E5E7EB;
+}
+
+.pipeline-scrollbar::-webkit-scrollbar {
+  height: 14px;
+}
+
+.pipeline-scrollbar::-webkit-scrollbar-track {
+  background: #E5E7EB;
+  border-radius: 999px;
+}
+
+.pipeline-scrollbar::-webkit-scrollbar-thumb {
+  background: #0F5A3A;
+  border-radius: 999px;
+  border: 3px solid #E5E7EB;
+}
+
+.pipeline-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0A432B;
+}

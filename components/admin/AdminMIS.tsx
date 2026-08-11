@@ -393,6 +393,22 @@ export default function AdminMIS({
 
   const statuses = [...APPLICATION_STATUSES];
 
+  const filteredApplications = effectiveSelectedStatus
+    ? mis.applications.filter((application) => {
+        if (effectiveSelectedStatus === "Not Set") {
+          return (
+            !application.application_status ||
+            application.application_status.trim() === ""
+          );
+        }
+
+        return (
+          application.application_status ===
+          effectiveSelectedStatus
+        );
+      })
+    : [];
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -601,6 +617,125 @@ export default function AdminMIS({
             }
           />
         </div>
+
+        {effectiveSelectedStatus && (
+          <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-200 bg-slate-50 px-6 py-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900">
+                    {effectiveSelectedStatus}
+                  </h3>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    {filteredApplications.length}{" "}
+                    {filteredApplications.length === 1
+                      ? "application"
+                      : "applications"}{" "}
+                    in this stage
+                  </p>
+                </div>
+
+                <div className="rounded-full bg-[#0F5A3A]/10 px-4 py-2 text-sm font-semibold text-[#0F5A3A]">
+                  {filteredApplications.length} Cases
+                </div>
+              </div>
+            </div>
+
+            {filteredApplications.length === 0 ? (
+              <div className="px-6 py-12 text-center">
+                <p className="font-semibold text-slate-700">
+                  No applications found
+                </p>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  There are currently no merchants in this stage.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[1000px]">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-white">
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Merchant
+                      </th>
+
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Company
+                      </th>
+
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Product
+                      </th>
+
+                      <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Loan Amount
+                      </th>
+
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Relationship Manager
+                      </th>
+
+                      <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        RM Phone
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {filteredApplications.map((application) => (
+                      <tr
+                        key={application.id}
+                        className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50"
+                      >
+                        <td className="px-5 py-5">
+                          <div>
+                            <p className="font-semibold text-slate-900">
+                              {application.full_name}
+                            </p>
+
+                            <p className="mt-1 text-xs text-slate-500">
+                              @{application.username}
+                            </p>
+                          </div>
+                        </td>
+
+                        <td className="px-5 py-5 text-sm text-slate-700">
+                          {application.company || "—"}
+                        </td>
+
+                        <td className="px-5 py-5 text-sm text-slate-700">
+                          {application.product || "Business Loan"}
+                        </td>
+
+                        <td className="px-5 py-5 text-right font-mono text-sm font-semibold text-slate-900">
+                          {application.loan_amount !== null
+                            ? formatIndianCurrency(
+                                application.loan_amount
+                              )
+                            : "—"}
+                        </td>
+
+                        <td className="px-5 py-5">
+                          <p className="text-sm font-medium text-slate-900">
+                            {application.relationship_manager ||
+                              "Not Assigned"}
+                          </p>
+                        </td>
+
+                        <td className="px-5 py-5 text-sm text-slate-600">
+                          {application.relationship_manager_phone ||
+                            "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </section>
     </div>
   );
