@@ -54,19 +54,22 @@ export async function uploadDocument(
 export async function getCustomerDocuments(
   username: string
 ): Promise<CustomerDocument[]> {
-  const { data, error } = await supabase
-    .from("customer_documents")
-    .select("*")
-    .eq("customer_username", username)
-    .order("uploaded_at", {
-      ascending: false,
-    });
+  const response = await fetch("/api/portal/documents", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
 
-  if (error) {
-    throw error;
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok || !result?.success) {
+    throw new Error(
+      result?.message || "Failed to fetch documents."
+    );
   }
 
-  return data as CustomerDocument[];
+  return (result.documents ?? []) as CustomerDocument[];
 }
 
 export async function getSignedUrl(
