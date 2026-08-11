@@ -9,6 +9,7 @@ export type Customer = {
   // Current Admin handling/owning this merchant
   admin_username?: string | null;
   admin_full_name?: string | null;
+  created_by_admin_id?: string | null;
 
   company: string | null;
   phone: string | null;

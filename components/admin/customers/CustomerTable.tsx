@@ -13,12 +13,28 @@ interface CustomerTableProps {
   selectedStatus: string | null;
 }
 
+type Admin = {
+  id: string;
+  username: string;
+  full_name: string;
+  role: string;
+  account_status?: string;
+};
+
+const ALL_ADMINS = "__ALL_ADMINS__";
+
 export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
   const tableScrollRef = useRef<HTMLDivElement>(null);
   const scrollbarRef = useRef<HTMLDivElement>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
+
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [selectedAdminId, setSelectedAdminId] =
+    useState<string>(ALL_ADMINS);
+  const [adminLoading, setAdminLoading] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -72,6 +88,65 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
     loadCustomers();
   }, []);
 
+  // Super Admin only: load Admin accounts for customer filtering.
+  useEffect(() => {
+    const storedAdmin = sessionStorage.getItem("admin");
+
+    if (!storedAdmin) {
+      return;
+    }
+
+    try {
+      const admin = JSON.parse(storedAdmin);
+      const superAdmin = admin?.role === "Super Admin";
+
+      setIsSuperAdmin(superAdmin);
+
+      if (!superAdmin) {
+        return;
+      }
+
+      async function loadAdmins() {
+        try {
+          setAdminLoading(true);
+
+          const response = await fetch("/api/admin/admins", {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result?.success) {
+            throw new Error(
+              result?.message || "Unable to load Admin accounts."
+            );
+          }
+
+          setAdmins(result.admins ?? []);
+        } catch (error) {
+          console.error(
+            "Failed to load Admin accounts:",
+            error
+          );
+          setAdmins([]);
+        } finally {
+          setAdminLoading(false);
+        }
+      }
+
+      loadAdmins();
+    } catch (error) {
+      console.error(
+        "Failed to read Admin session:",
+        error
+      );
+      setIsSuperAdmin(false);
+    }
+  }, []);
+
   // Filter by application status from URL
   useEffect(() => {
     let filtered = customers;
@@ -87,6 +162,17 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
       }
     }
 
+    // Super Admin only: filter customers by Admin owner.
+    if (
+      isSuperAdmin &&
+      selectedAdminId !== ALL_ADMINS
+    ) {
+      filtered = filtered.filter(
+        (customer) =>
+          customer.created_by_admin_id === selectedAdminId
+      );
+    }
+
     // Then apply search filter
     const value = search.toLowerCase();
     filtered = filtered.filter((customer) => {
@@ -98,7 +184,13 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
     });
 
     setFilteredCustomers(filtered);
-  }, [customers, search, selectedStatus]);
+  }, [
+    customers,
+    search,
+    selectedStatus,
+    isSuperAdmin,
+    selectedAdminId,
+  ]);
 
   function openCustomer(customer: Customer) {
     setSelectedCustomer(customer);
@@ -185,6 +277,31 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
                 className="outline-none"
               />
             </div>
+
+            {isSuperAdmin && (
+              <select
+                value={selectedAdminId}
+                onChange={(e) =>
+                  setSelectedAdminId(e.target.value)
+                }
+                disabled={adminLoading}
+                aria-label="Filter customers by Admin"
+                className="min-w-[220px] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 outline-none focus:border-[#0F5A3A] focus:ring-2 focus:ring-[#0F5A3A]/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+              >
+                <option value={ALL_ADMINS}>
+                  All Admins
+                </option>
+
+                {admins.map((admin) => (
+                  <option
+                    key={admin.id}
+                    value={admin.id}
+                  >
+                    {admin.full_name} — {admin.role}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <button
               onClick={() => setCreateModalOpen(true)}
