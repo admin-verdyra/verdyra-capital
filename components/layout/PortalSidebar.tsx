@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   FolderOpen,
-  Bell,
   User,
   LogOut,
   ChevronRight,
@@ -23,11 +22,6 @@ const navItems = [
     icon: FolderOpen,
   },
   {
-    title: "Notifications",
-    href: "/portal/notifications",
-    icon: Bell,
-  },
-  {
     title: "Profile",
     href: "/portal/profile",
     icon: User,
@@ -36,24 +30,47 @@ const navItems = [
 
 export default function PortalSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/portal/auth/logout", {
+        method: "POST",
+      });
+
+      // Clear cached customer in sessionStorage regardless
+      try {
+        sessionStorage.removeItem("customer");
+      } catch {}
+
+      // Navigate to portal login
+      router.push("/portal");
+    } catch (err) {
+      console.error("Logout failed", err);
+      try {
+        sessionStorage.removeItem("customer");
+      } catch {}
+      router.push("/portal");
+    }
+  }
 
   return (
     <aside className="hidden lg:flex w-72 shrink-0 flex-col bg-gradient-to-b from-[#0F5A3A] to-[#0A402A] text-white shadow-2xl">
 
       {/* Logo */}
 
-      <Link
-  href="/portal"
+      <a
+  href="https://www.verdyracapital.in/"
   className="block border-b border-white/10 px-8 py-8 transition hover:bg-white/5"
+  target="_self"
+  rel="noopener noreferrer"
 >
-  <h1 className="text-3xl font-bold tracking-tight">
-    Verdyra
-  </h1>
-
-  <p className="mt-2 text-sm text-white/70">
-    Customer Portal
-  </p>
-</Link>
+  <img
+    src="/images/logo/logo-horizontal.png"
+    alt="Verdyra Capital"
+    className="h-10 w-auto"
+  />
+</a>
 
       {/* Navigation */}
 
@@ -109,14 +126,21 @@ export default function PortalSidebar() {
 
       {/* Footer */}
 
-      <div className="border-t border-white/10 p-6">
+      <div className="border-t border-white/10 p-6 space-y-3">
 
-        <Link
-          href="/"
-          className="flex items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 font-semibold text-[#0F5A3A] transition hover:scale-[1.02] hover:bg-slate-100"
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 font-semibold text-[#0F5A3A] transition hover:scale-[1.02] hover:bg-slate-100"
         >
           <LogOut size={18} />
 
+          Logout
+        </button>
+
+        <Link
+          href="/"
+          className="w-full block text-center rounded-2xl bg-white/5 px-5 py-3 font-medium text-white/90 transition hover:bg-white/10"
+        >
           Exit Portal
         </Link>
 

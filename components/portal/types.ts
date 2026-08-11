@@ -1,14 +1,26 @@
 export type Customer = {
+  auth_user_id?: string | null;
+
   username: string;
-  password: string;
 
   full_name: string;
   email: string;
 
+  // Current Admin handling/owning this merchant
+  admin_username?: string | null;
+  admin_full_name?: string | null;
+
+  company: string | null;
+  phone: string | null;
+  date_of_birth: string | null;
+
   loan_amount: number | null;
   product: string | null;
   application_status: string | null;
+  account_status: 'active' | 'disabled';
   relationship_manager: string | null;
+  relationship_manager_email: string | null;
+  relationship_manager_phone: string | null;
   expected_approval_date: string | null;
   progress: number | null;
 };
@@ -45,6 +57,12 @@ export const DOCUMENTS: DocumentDefinition[] = [
     storagePrefix: "gst-certificate",
   },
   {
+    id: "msme",
+    label: "MSME Certificate",
+    description: "MSME registration certificate",
+    storagePrefix: "msme-certificate",
+  },
+  {
     id: "bank",
     label: "Bank Statements",
     description: "Latest 6 months bank statements",
@@ -55,6 +73,18 @@ export const DOCUMENTS: DocumentDefinition[] = [
     label: "Financial Statements",
     description: "P&L and Balance Sheet",
     storagePrefix: "financial-statements",
+  },
+  {
+    id: "debt_profile",
+    label: "Debt Profile",
+    description: "Debt profile spreadsheet",
+    storagePrefix: "debt-profile",
+  },
+  {
+    id: "mis",
+    label: "MIS",
+    description: "Management Information System report",
+    storagePrefix: "mis",
   },
   {
     id: "additional",

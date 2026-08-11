@@ -18,8 +18,10 @@ export default function DashboardPage() {
   if (!customer) return null;
 
   return (
-    <div className="space-y-8">
+    <div className="w-full space-y-8">
       <DashboardHero customer={customer} />
+
+      <QuickActions />
 
       <DashboardStats customer={customer} />
 
@@ -31,10 +33,7 @@ export default function DashboardPage() {
         <RecentActivity />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <RelationshipManager />
-        <QuickActions />
-      </div>
+      <RelationshipManager customer={customer} />
 
       <ProfileCard customer={customer} />
     </div>

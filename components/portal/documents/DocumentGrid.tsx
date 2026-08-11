@@ -1,5 +1,6 @@
 "use client";
 
+import { DOCUMENTS } from "@/components/portal/types";
 import type { CustomerDocument } from "@/lib/documents/documentService";
 import DocumentCard from "./DocumentCard";
 
@@ -9,33 +10,6 @@ type Props = {
   onPreview: (document: CustomerDocument) => void;
 };
 
-const requiredDocuments = [
-  {
-    type: "aadhaar",
-    label: "Aadhaar Card",
-  },
-  {
-    type: "pan",
-    label: "PAN Card",
-  },
-  {
-    type: "gst",
-    label: "GST Certificate",
-  },
-  {
-    type: "bank",
-    label: "Bank Statements",
-  },
-  {
-    type: "financial",
-    label: "Financial Statements",
-  },
-  {
-    type: "additional",
-    label: "Additional Documents",
-  },
-];
-
 export default function DocumentGrid({
   documents,
   onUpload,
@@ -43,19 +17,26 @@ export default function DocumentGrid({
 }: Props) {
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {requiredDocuments.map((item) => {
-        const uploaded = documents.find(
-          (d) => d.document_type === item.type
+      {DOCUMENTS.map((item) => {
+        const uploaded = documents.filter(
+          (d) => d.document_type === item.id
         );
 
         return (
           <DocumentCard
-            key={item.type}
+            key={item.id}
             title={item.label}
-            documentType={item.type}
-            document={uploaded}
+            documentType={item.id}
+            documents={uploaded}
             onUpload={onUpload}
             onPreview={onPreview}
+            templateUrl={
+              item.id === "debt_profile"
+                ? "/templates/Debt%20profile.xlsx"
+                : item.id === "mis"
+                ? "/templates/MIS%20Format.xlsx"
+                : undefined
+            }
           />
         );
       })}

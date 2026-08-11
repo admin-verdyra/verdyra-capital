@@ -7,6 +7,15 @@ type ProfileCardProps = {
 };
 
 export default function ProfileCard({ customer }: ProfileCardProps) {
+  const initials = customer.full_name
+    ? customer.full_name
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "C";
+
   const profileItems = [
     {
       label: "Full Name",
@@ -23,22 +32,22 @@ export default function ProfileCard({ customer }: ProfileCardProps) {
   ];
 
   return (
-    <section className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-[30px] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
 
       <div className="flex items-center justify-between">
 
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#B8860B]">
+          <p className="text-sm font-medium uppercase tracking-[0.25em] text-slate-400">
             Profile
           </p>
 
-          <h3 className="mt-2 text-2xl font-bold text-[#111111]">
+          <h3 className="mt-2 text-xl md:text-2xl font-bold text-slate-900">
             Customer Information
           </h3>
         </div>
 
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#EDF7F2] text-2xl">
-          👤
+        <div className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#0F5A3A] to-[#1D7C55] text-xl md:text-2xl font-bold text-white shadow-lg">
+          {initials}
         </div>
 
       </div>
@@ -48,13 +57,13 @@ export default function ProfileCard({ customer }: ProfileCardProps) {
         {profileItems.map((item) => (
           <div
             key={item.label}
-            className="rounded-2xl border border-slate-200 bg-[#F8FAF9] p-5"
+            className="rounded-2xl border border-slate-200 bg-white p-5"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
               {item.label}
             </p>
 
-            <p className="mt-3 break-words text-base font-semibold text-[#111111]">
+            <p className="mt-3 break-words text-base font-semibold text-slate-900">
               {item.value}
             </p>
           </div>

@@ -4,6 +4,7 @@ const footerLinks = [
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms of Service", href: "/terms-and-conditions" },
   { label: "Disclaimer", href: "/disclaimer" },
+  { label: "Admin Login", href: "/admin" },
 ];
 const services = [
   "Business Loans",

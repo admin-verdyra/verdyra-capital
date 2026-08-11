@@ -1,22 +1,19 @@
-import { supabase } from "@/lib/supabase";
 import type { CustomerDocument } from "@/lib/documents/documentService";
 
 export async function getCustomerDocumentsForReview(
   username: string
 ): Promise<CustomerDocument[]> {
-  const { data, error } = await supabase
-    .from("customer_documents")
-    .select("*")
-    .eq("customer_username", username)
-    .order("uploaded_at", {
-      ascending: false,
-    });
+  const response = await fetch(`/api/admin/documents?username=${encodeURIComponent(username)}`, {
+    method: "GET",
+  });
 
-  if (error) {
-    throw error;
+  const result = await response.json();
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message ?? "Failed to fetch documents.");
   }
 
-  return (data ?? []) as CustomerDocument[];
+  return result.documents as CustomerDocument[];
 }
 
 export async function reviewDocument(
@@ -28,17 +25,22 @@ export async function reviewDocument(
   reviewer: string,
   remarks: string
 ) {
-  const { error } = await supabase
-    .from("customer_documents")
-    .update({
+  const response = await fetch("/api/admin/documents", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      document_id: documentId,
       status,
-      reviewed_at: new Date().toISOString(),
-      reviewed_by: reviewer,
+      reviewer,
       remarks,
-    })
-    .eq("id", documentId);
+    }),
+  });
 
-  if (error) {
-    throw error;
+  const result = await response.json();
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message ?? "Failed to review document.");
   }
 }
