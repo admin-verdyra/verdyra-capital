@@ -25,7 +25,7 @@ export default function AdminShell({
         onClose={() => setIsMobileMenuOpen(false)}
       />
 
-      <div className="flex flex-1 flex-col lg:pl-0">
+      <div className="min-w-0 flex-1 flex flex-col lg:pl-0">
         <AdminHeader
           title={title}
           subtitle={subtitle}
@@ -33,8 +33,8 @@ export default function AdminShell({
           isMobileMenuOpen={isMobileMenuOpen}
         />
 
-        <main className="flex-1 p-6 lg:p-8">
-          <div className="mx-auto max-w-[1600px]">
+        <main className="min-w-0 flex-1 overflow-x-hidden p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1600px] min-w-0">
             {children}
           </div>
         </main>

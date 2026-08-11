@@ -5,6 +5,11 @@ export type Customer = {
 
   full_name: string;
   email: string;
+
+  // Current Admin handling/owning this merchant
+  admin_username?: string | null;
+  admin_full_name?: string | null;
+
   company: string | null;
   phone: string | null;
   date_of_birth: string | null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, Eye, Plus, Loader2, AlertCircle, CheckCircle } from "lucide-react";
 
 import type { Customer } from "@/components/portal/types";
@@ -14,6 +14,8 @@ interface CustomerTableProps {
 }
 
 export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
+  const tableScrollRef = useRef<HTMLDivElement>(null);
+  const scrollbarRef = useRef<HTMLDivElement>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
@@ -33,6 +35,29 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
   const [statusSuccess, setStatusSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    const tableScroll = tableScrollRef.current;
+    const scrollbar = scrollbarRef.current;
+
+    if (!tableScroll || !scrollbar) return;
+
+    const syncCustomerTableScrollbar = () => {
+      scrollbar.scrollLeft = tableScroll.scrollLeft;
+    };
+
+    const syncCustomerTable = () => {
+      tableScroll.scrollLeft = scrollbar.scrollLeft;
+    };
+
+    tableScroll.addEventListener("scroll", syncCustomerTableScrollbar);
+    scrollbar.addEventListener("scroll", syncCustomerTable);
+
+    return () => {
+      tableScroll.removeEventListener("scroll", syncCustomerTableScrollbar);
+      scrollbar.removeEventListener("scroll", syncCustomerTable);
+    };
+  }, []);
 
   async function loadCustomers() {
     const data = await getCustomers();
@@ -171,16 +196,29 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
           </div>
         </div>
 
-        <table className="w-full">
-          <thead className="bg-slate-50">
+        <div
+          ref={tableScrollRef}
+          className="w-full overflow-x-auto overflow-y-hidden"
+        >
+            <table
+              className="table-fixed"
+              style={{ width: "1450px", minWidth: "1450px" }}
+            >
+            <thead className="bg-slate-50">
             <tr>
-              <th className="px-6 py-4 text-left">Customer</th>
-              <th className="px-6 py-4 text-left">Product</th>
-              <th className="px-6 py-4 text-left">Loan Amount</th>
-              <th className="px-6 py-4 text-left">Application Status</th>
-              <th className="px-6 py-4 text-left">Account Status</th>
-              <th className="px-6 py-4 text-left">RM</th>
-              <th className="px-6 py-4 text-center">View</th>
+              <th style={{ width: "240px" }} className="px-6 py-4 text-left whitespace-nowrap">Customer</th>
+              <th style={{ width: "190px" }} className="px-6 py-4 text-left whitespace-nowrap">Admin</th>
+              <th style={{ width: "150px" }} className="px-6 py-4 text-left whitespace-nowrap">Product</th>
+              <th style={{ width: "160px" }} className="px-6 py-4 text-left whitespace-nowrap">Loan Amount</th>
+              <th style={{ width: "240px" }} className="px-6 py-4 text-left whitespace-nowrap">Application Status</th>
+              <th style={{ width: "150px" }} className="px-6 py-4 text-left whitespace-nowrap">Account Status</th>
+              <th style={{ width: "180px" }} className="px-6 py-4 text-left whitespace-nowrap">RM</th>
+              <th
+                style={{ width: "100px" }}
+                className="px-4 py-4 text-center whitespace-nowrap bg-slate-50"
+              >
+                View
+              </th>
             </tr>
           </thead>
 
@@ -197,6 +235,23 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
                       <h3 className="font-semibold">{customer.full_name}</h3>
                       <p className="text-sm text-slate-500">{customer.email}</p>
                     </div>
+                  </td>
+
+                  <td className="px-6 py-5">
+                    {customer.admin_username ? (
+                      <div>
+                        <p className="font-medium text-slate-900">
+                          {customer.admin_full_name}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          @{customer.admin_username}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-slate-400">
+                        Unassigned
+                      </span>
+                    )}
                   </td>
 
                   <td className="px-6 py-5">{customer.product}</td>
@@ -255,7 +310,7 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
 
                   <td className="px-6 py-5">{customer.relationship_manager}</td>
 
-                  <td className="px-6 py-5 text-center">
+                  <td className="min-w-[100px] bg-white px-4 py-5 text-center whitespace-nowrap">
                     <button
                       onClick={() => openCustomer(customer)}
                       className="rounded-xl border p-3 transition hover:bg-slate-100"
@@ -267,7 +322,16 @@ export default function CustomerTable({ selectedStatus }: CustomerTableProps) {
               );
             })}
           </tbody>
-        </table>
+          </table>
+
+          <div
+            ref={scrollbarRef}
+            className="mx-4 mb-4 mt-2 h-4 overflow-x-auto rounded-full bg-slate-100"
+            aria-label="Horizontal table scrollbar"
+          >
+            <div style={{ width: "1450px", height: "1px" }} />
+          </div>
+        </div>
       </section>
 
       <CustomerDetailsDrawer customer={selectedCustomer} open={drawerOpen} onClose={closeDrawer} />

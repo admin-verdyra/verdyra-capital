@@ -24,6 +24,7 @@ type AdminRecord = {
   email: string | null;
   role: string | null;
   auth_user_id: string | null;
+  account_status: "active" | "disabled";
 };
 
 export type SafeAdmin = {
@@ -33,6 +34,7 @@ export type SafeAdmin = {
   email: string | null;
   role: string;
   auth_user_id: string;
+  account_status: "active" | "disabled";
 };
 
 export type AdminLoginResult = {
@@ -73,6 +75,7 @@ function toSafeAdmin(admin: AdminRecord): SafeAdmin {
     email: admin.email,
     role: admin.role ?? "Admin",
     auth_user_id: admin.auth_user_id,
+    account_status: admin.account_status,
   };
 }
 
@@ -84,7 +87,7 @@ async function getAdminByAuthUserId(
   const { data, error } = await supabase
     .from("admins")
     .select(
-      "id, username, full_name, email, role, auth_user_id"
+      "id, username, full_name, email, role, auth_user_id, account_status"
     )
     .eq("auth_user_id", authUserId)
     .maybeSingle<AdminRecord>();
@@ -109,7 +112,7 @@ async function updateAdminAuthUserId(
     })
     .eq("username", username)
     .select(
-      "id, username, full_name, email, role, auth_user_id"
+      "id, username, full_name, email, role, auth_user_id, account_status"
     )
     .single<AdminRecord>();
 
@@ -149,6 +152,11 @@ export async function loginAdminWithSupabaseAuth(
     return null;
   }
 
+  // Disabled Admin accounts cannot authenticate.
+  if (admin.account_status !== "active") {
+    return null;
+  }
+
   // Verify the email matches (defense in depth)
   if (admin.email?.toLowerCase() !== normalizedEmail) {
     return null;
@@ -172,6 +180,11 @@ export async function getAdminFromAccessToken(
   const admin = await getAdminByAuthUserId(user.id);
 
   if (!admin) {
+    return null;
+  }
+
+  // Disabled Admin accounts cannot maintain an active session.
+  if (admin.account_status !== "active") {
     return null;
   }
 

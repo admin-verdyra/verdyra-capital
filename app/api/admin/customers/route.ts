@@ -971,6 +971,33 @@ export async function GET(request: Request) {
       );
     }
 
+    // Fetch Admin records so Super Admin can see merchant ownership.
+    const { data: adminRecords, error: adminRecordsError } = await supabase
+      .from("admins")
+      .select("id, username, full_name, role");
+
+    if (adminRecordsError) {
+      console.error("Admin ownership lookup failed:", adminRecordsError);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to fetch merchant ownership.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const adminMap = new Map(
+      (adminRecords ?? []).map((a) => [
+        a.id,
+        {
+          username: a.username,
+          full_name: a.full_name,
+          role: a.role,
+        },
+      ])
+    );
+
     // 3. Transform to match Customer type expected by CustomerTable
     const safeCustomers = (customers ?? []).map((c) => ({
       id: c.id,
@@ -990,6 +1017,16 @@ export async function GET(request: Request) {
       expected_approval_date: c.expected_approval_date,
       progress: c.progress,
       auth_user_id: c.auth_user_id,
+      created_by_admin_id: c.created_by_admin_id,
+      admin_username: c.created_by_admin_id
+        ? adminMap.get(c.created_by_admin_id)?.username ?? null
+        : null,
+      admin_full_name: c.created_by_admin_id
+        ? adminMap.get(c.created_by_admin_id)?.full_name ?? null
+        : null,
+      admin_role: c.created_by_admin_id
+        ? adminMap.get(c.created_by_admin_id)?.role ?? null
+        : null,
     }));
 
     return NextResponse.json({

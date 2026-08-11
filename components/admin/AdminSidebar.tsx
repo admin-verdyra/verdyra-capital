@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -13,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 
-const navItems = [
+const baseNavItems = [
   {
     title: "Dashboard",
     href: "/admin/dashboard",
@@ -34,12 +35,19 @@ const navItems = [
     href: "/admin/pipeline",
     icon: GitBranch,
   },
+];
+
+const superAdminNavItems = [
   {
     title: "Settings",
     href: "/admin/settings",
     icon: Settings,
   },
 ];
+
+type AdminSession = {
+  role?: string;
+};
 
 export default function AdminSidebar({
   isMobileOpen,
@@ -50,6 +58,33 @@ export default function AdminSidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    try {
+      const storedAdmin = sessionStorage.getItem("admin");
+
+      if (!storedAdmin) {
+        return;
+      }
+
+      const admin = JSON.parse(
+        storedAdmin
+      ) as AdminSession;
+
+      setIsSuperAdmin(
+        admin.role === "Super Admin"
+      );
+    } catch {
+      setIsSuperAdmin(false);
+    }
+  }, []);
+
+  const navItems = [
+    ...baseNavItems,
+    ...(isSuperAdmin ? superAdminNavItems : []),
+  ];
 
   async function logout() {
     await fetch("/api/admin/auth/logout", {
@@ -62,7 +97,6 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -71,26 +105,27 @@ export default function AdminSidebar({
         />
       )}
 
-      {/* Sidebar */}
       <aside
         id="mobile-navigation-drawer"
         className={`fixed lg:static inset-y-0 left-0 z-50 w-72 shrink-0 flex-col bg-gradient-to-b from-[#0F5A3A] via-[#0F5A3A] to-[#0A402A] text-white shadow-2xl transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full"
         }`}
         aria-label="Admin navigation"
       >
-        {/* Mobile Close Button */}
-        <div className="lg:hidden flex items-center justify-end p-4">
-          <button
-            onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white/80 transition hover:bg-white/20 hover:text-white"
-            aria-label="Close navigation"
-          >
-            <X size={20} />
-          </button>
-        </div>
+        {isMobileOpen && (
+          <div className="lg:hidden flex items-center justify-end p-4">
+            <button
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white/80 transition hover:bg-white/20 hover:text-white"
+              aria-label="Close navigation"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        )}
 
-        {/* Brand */}
         <Link
           href="/admin/dashboard"
           className="border-b border-white/10 px-8 py-8 transition hover:bg-white/5 flex-shrink-0"
@@ -104,7 +139,12 @@ export default function AdminSidebar({
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
               >
-                <rect width="32" height="32" rx="8" fill="#D4AF37" />
+                <rect
+                  width="32"
+                  height="32"
+                  rx="8"
+                  fill="#D4AF37"
+                />
                 <path
                   d="M16 8L22 16L16 24"
                   stroke="white"
@@ -114,14 +154,18 @@ export default function AdminSidebar({
                 />
               </svg>
             </div>
+
             <div>
-              <h1 className="text-xl font-bold tracking-tight">Verdyra</h1>
-              <p className="text-xs text-white/60">Admin Portal</p>
+              <h1 className="text-xl font-bold tracking-tight">
+                Verdyra
+              </h1>
+              <p className="text-xs text-white/60">
+                Admin Portal
+              </p>
             </div>
           </div>
         </Link>
 
-        {/* Navigation */}
         <nav className="flex-1 px-5 py-6 overflow-y-auto">
           <p className="mb-4 px-4 text-xs font-semibold uppercase tracking-[0.25em] text-white/40">
             Navigation
@@ -130,8 +174,8 @@ export default function AdminSidebar({
           <div className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-
-              const active = pathname === item.href;
+              const active =
+                pathname === item.href;
 
               return (
                 <Link
@@ -145,8 +189,14 @@ export default function AdminSidebar({
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <Icon size={20} aria-hidden="true" />
-                    <span className="font-medium">{item.title}</span>
+                    <Icon
+                      size={20}
+                      aria-hidden="true"
+                    />
+
+                    <span className="font-medium">
+                      {item.title}
+                    </span>
                   </div>
 
                   <ChevronRight
@@ -164,13 +214,15 @@ export default function AdminSidebar({
           </div>
         </nav>
 
-        {/* Footer - Logout */}
         <div className="border-t border-white/10 p-6 flex-shrink-0">
           <button
             onClick={logout}
             className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 font-semibold text-[#0F5A3A] transition hover:scale-[1.02] hover:bg-slate-100"
           >
-            <LogOut size={18} aria-hidden="true" />
+            <LogOut
+              size={18}
+              aria-hidden="true"
+            />
             Logout
           </button>
         </div>
